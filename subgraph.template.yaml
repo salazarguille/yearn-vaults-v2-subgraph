@@ -29,6 +29,8 @@ dataSources:
           handler: handleNewRelease
         - event: NewVault(indexed address,indexed uint256,address,string)
           handler: handleNewVault
+        - event: NewExperimentalVault(indexed address,address,string)
+          handler: handleNewExperimentalVault
       file: ./src/mappings/registryMappings.ts
 templates:
   # 1 Vault (template)

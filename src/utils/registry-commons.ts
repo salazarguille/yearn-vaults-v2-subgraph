@@ -4,9 +4,12 @@ import { getTimestampInMillis } from "./commons";
 import { ERC20 } from "../../generated/Registry/ERC20";
 import { Vault as VaultContract } from "../../generated/Registry/Vault";
 
+import { Vault as VaultTemplate } from "../../generated/templates";
+
 export function createVault(
   transactionId: string,
   vault: Address,
+  status: string,
   apiVersion: string,
   deploymentId: BigInt,
   token: Address,
@@ -16,28 +19,32 @@ export function createVault(
   let erc20Instance = ERC20.bind(token)
 
   let id = vault.toHexString()
-  let entity = new Vault(id)
-  entity.transaction = transactionId
-  entity.status = 'Added'
-  entity.deploymentId = deploymentId
-  entity.strategies = []
+  let entity = Vault.load(id)
+  if(entity == null) {
+    entity = new Vault(id)
+    entity.transaction = transactionId
+    entity.status = status
+    entity.deploymentId = deploymentId
+    entity.strategies = []
+  
+    entity.token = token
+    entity.tokenName = erc20Instance.name()
+    entity.tokenSymbol = erc20Instance.symbol()
+    entity.tokenDecimals = BigInt.fromI32(erc20Instance.decimals())
+  
+    entity.vault = vault
+    entity.vaultName = vaultInstance.name()
+    entity.vaultSymbol = vaultInstance.symbol()
+    entity.vaultDecimals = vaultInstance.decimals()
+    entity.apiVersion = apiVersion
 
-  entity.token = token
-  entity.tokenName = erc20Instance.name()
-  entity.tokenSymbol = erc20Instance.symbol()
-  entity.tokenDecimals = BigInt.fromI32(erc20Instance.decimals())
-
-  entity.vault = vault
-  entity.vaultName = vaultInstance.name()
-  entity.vaultSymbol = vaultInstance.symbol()
-  entity.vaultDecimals = vaultInstance.decimals()
-  entity.apiVersion = apiVersion
+    VaultTemplate.create(vault);
+  }
 
   entity.blockNumber = event.block.number
   entity.timestamp = getTimestampInMillis(event)
   entity.save()
-
-  return entity
+  return entity as Vault
 }
 
 export function releaseVault(
