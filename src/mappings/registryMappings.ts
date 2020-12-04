@@ -22,7 +22,7 @@ export function handleNewVault(event: NewVaultEvent): void {
   createVault(
     ethTransaction.id,
     event.params.vault,
-    "Added",
+    "Endorsed",
     event.params.api_version,
     event.params.event_id,
     event.params.token,
