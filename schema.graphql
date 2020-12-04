@@ -1,0 +1,105 @@
+enum VaultStatus {
+  Added
+  Released
+}
+
+type EthTransaction @entity {
+  id: ID!
+  event: String!
+  from: Bytes!
+  gasPrice: BigInt!
+  gasSent: BigInt!
+  hash: Bytes!
+  index: BigInt!
+  to: Bytes!
+  value: BigInt!
+  contract: Bytes!
+  timestamp: BigInt!
+  gasLimit: BigInt!
+  blockNumber: BigInt!
+}
+
+type Vault @entity {
+  "The Vault ID."
+  id: ID!
+  "The ETH transaction when the event was emitted."
+  transaction: EthTransaction!
+  "Indicates the current vault status."
+  status: VaultStatus!
+  "The Vault address."
+  vault: Bytes!
+  "The strategies associated to this vault."
+  strategies: [Strategy!]!
+  "The vault name."
+  vaultName: String!
+  "The vault symbol."
+  vaultSymbol: String!
+  "The vault decimals."
+  vaultDecimals: BigInt!
+  "The API verssion."
+  apiVersion: String!
+  "The deployment ID."
+  deploymentId: BigInt!
+  "The token address."
+  token: Bytes!
+  "The token name."
+  tokenName: String!
+  "The token symbol."
+  tokenSymbol: String!
+  "The token decimals."
+  tokenDecimals: BigInt!
+  "Blocknumber the vault information was most recently updated."
+  blockNumber: BigInt!
+  "Timestamp the vault information was most recently updated."
+  timestamp: BigInt!
+}
+
+type Strategy @entity {
+  "The Strategy ID."
+  id: ID!
+  "The ETH transaction when the event was emitted."
+  transaction: EthTransaction!
+  "The Strategy address."
+  strategy: Bytes!
+  "The Vault address."
+  vault: Bytes!
+  "The reports created for this strategy."
+  reports: [StrategyReport!]!
+  "Defines the maximum borrow amount."
+  debtLimit: BigInt!
+  "It is the current rate limit. It increases/decreases per block."
+  rateLimit: BigInt!
+  "Defines the strategist's fee (basis points)."
+  performanceFee: BigInt!
+  "Blocknumber the vault information was most recently updated."
+  blockNumber: BigInt!
+  "Timestamp the vault information was most recently updated."
+  timestamp: BigInt!
+}
+
+type StrategyReport @entity {
+  "The Strategy Report ID."
+  id: ID!
+  "The ETH transaction when the event was emitted."
+  transaction: EthTransaction!
+  "The Strategy reference."
+  strategy: Strategy! @relation
+  "The reported gain amount for the strategy."
+  gain: BigInt!
+  "The reported loss amount for the strategy."
+  loss: BigInt!
+  "The reported total gain amount for the strategy."
+  totalGain: BigInt!
+  "The reported total loss amount for the strategy."
+  totalLoss: BigInt!
+  "The reported total debt amount for the strategy."
+  totalDebt: BigInt!
+  "The reported debt added amount for the strategy."
+  debtAdded: BigInt!
+  "The reported debt limit amount for the strategy."
+  debtLimit: BigInt!
+  "Blocknumber the strategy report was most recently updated."
+  blockNumber: BigInt!
+  "Timestamp the strategy report was most recently updated."
+  timestamp: BigInt!
+}

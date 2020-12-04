@@ -1,0 +1,55 @@
+specVersion: 0.0.3
+schema:
+  file: ./schema.graphql
+dataSources:
+  # 1 Registry
+  - kind: ethereum/contract
+    name: Registry
+    network: {{network}}
+    source:
+      startBlock: {{startBlock}}
+      address: '{{Registry}}'
+      abi: Registry
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      language: wasm/assemblyscript
+      entities:
+        - Vault
+        - EthTransaction
+      abis:
+        - name: Registry
+          file: ./abis/Registry.json
+        - name: ERC20
+          file: ./abis/ERC20Detailed.json
+        - name: Vault
+          file: ./abis/Vault.json
+      eventHandlers:
+        - event: NewRelease(indexed uint256,address,string)
+          handler: handleNewRelease
+        - event: NewVault(indexed address,indexed uint256,address,string)
+          handler: handleNewVault
+      file: ./src/mappings/registryMappings.ts
+templates:
+  # 1 Vault (template)
+  - name: Vault
+    kind: ethereum/contract
+    network: {{network}}
+    source:
+      abi: Vault
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.1
+      language: wasm/assemblyscript
+      file: ./src/mappings/vaultMappings.ts
+      entities:
+        - Vault
+        - Strategy
+      abis:
+        - name: Vault
+          file: ./abis/Vault.json
+      eventHandlers:
+        - event: StrategyAdded(indexed address,uint256,uint256,uint256)
+          handler: handleStrategyAdded
+        - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleStrategyReported
