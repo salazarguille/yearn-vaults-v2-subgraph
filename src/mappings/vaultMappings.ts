@@ -87,21 +87,19 @@ export function createStrategy(
   event: ethereum.Event
 ): Strategy {
   let id = strategy.toHexString()
-  let strategyEntity = new Strategy(id)
-  strategyEntity.transaction = transactionId
-  strategyEntity.address = strategy
-  // TODO: can we use vaultId directly instead of loading Vault?
-  let vaultId = vault.toHexString();
-  let vaultEntity = Vault.load(vaultId);
-  strategyEntity.vault = vaultEntity.id;
-  strategyEntity.reports = []
-  strategyEntity.debtLimit = debtLimit
-  strategyEntity.rateLimit = rateLimit
-  strategyEntity.performanceFee = performanceFee
-  strategyEntity.blockNumber = event.block.number
-  strategyEntity.timestamp = getTimestampInMillis(event)
-  strategyEntity.save()
-  return strategyEntity
+  let entity = new Strategy(id)
+  entity.transaction = transactionId
+  entity.address = strategy
+  entity.vault = vault.toHexString()
+  entity.reports = []
+  entity.harvests = []
+  entity.debtLimit = debtLimit
+  entity.rateLimit = rateLimit
+  entity.performanceFee = performanceFee
+  entity.blockNumber = event.block.number
+  entity.timestamp = getTimestampInMillis(event)
+  entity.save()
+  return entity
 }
 
 export function addStrategyToVault(
