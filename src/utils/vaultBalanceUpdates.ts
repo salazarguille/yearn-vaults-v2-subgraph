@@ -1,9 +1,9 @@
 import { BigInt, ethereum as eth } from '@graphprotocol/graph-ts';
 
 import {
-    DepositCall,
+    Deposit1Call as DepositCall,
     Transfer as TransferEvent,
-    WithdrawCall,
+    Withdraw1Call as WithdrawCall,
     Vault as VaultContract
 } from "../../generated/Registry/Vault";
 
@@ -226,8 +226,8 @@ export function mapDeposit(call: DepositCall): void {
     let vaultContract = VaultContract.bind(event.address);
   
     let token = getOrCreateToken(event.address);
-    let sender = getOrCreateAccount(event.params.from);
-    let receiver = getOrCreateAccount(event.params.from);
+    let sender = getOrCreateAccount(event.params.sender);
+    let receiver = getOrCreateAccount(event.params.receiver);
   
     let transfer = new Transfer(id.toString());
     transfer.from = sender.id;
