@@ -5,14 +5,16 @@ import {
   Deposit1Call as DepositCall,
   Transfer as TransferEvent,
   Withdraw1Call as WithdrawCall,
+  Vault as VaultContract,
 } from "../../generated/Registry/Vault";
 import { Strategy, StrategyReport, Vault } from "../../generated/schema";
 import {
-  mapDeposit,
-  mapTransfer,
-  mapWithdrawal,
+  internalMapDeposit,
+  internalMapTransfer,
+  internalMapWithdrawal,
 } from "../utils/vaultBalanceUpdates";
 import { buildIdFromEvent, createEthTransaction, getTimestampInMillis } from "../utils/commons";
+import { getOrCreateVault } from "../utils/vault";
 
 export function createStrategyReport(
   transactionId: string,
@@ -111,8 +113,7 @@ export function addStrategyToVault(
   rateLimit: BigInt,
   event: ethereum.Event,
 ): void {
-  let id = vaultAddress.toHexString()
-  let entity = Vault.load(id)
+  let entity = getOrCreateVault(vaultAddress, false)
   if(entity !== null) {
     let newStrategy = createStrategy(
       transactionId,
@@ -164,13 +165,49 @@ export function handleStrategyReported(event: StrategyReportedEvent): void {
 //  VAULT BALANCE UPDATES
 
 export function handleDeposit(call: DepositCall): void {
-  mapDeposit(call);
+  let vaultContract = VaultContract.bind(call.to)
+  internalMapDeposit(
+    call.transaction.hash,
+    call.transaction.index,
+    call.to,
+    call.from,
+    call.inputs._amount,
+    vaultContract.totalAssets(),
+    vaultContract.totalSupply(),
+    vaultContract.pricePerShare(),
+    call.block.timestamp,
+    call.block.number
+  );
 }
 
 export function handleWithdrawal(call: WithdrawCall): void {
- mapWithdrawal(call);
+  let vaultContract = VaultContract.bind(call.to)
+ internalMapWithdrawal(
+  call.transaction.hash,
+  call.transaction.index,
+  call.to,
+  call.from,
+  call.inputs._shares,
+  vaultContract.totalAssets(),
+  vaultContract.totalSupply(),
+  vaultContract.pricePerShare(),
+  call.block.timestamp,
+  call.block.number
+ );
 }
 
 export function handleTransfer(event: TransferEvent): void {
-  mapTransfer(event);
+  let vaultContract = VaultContract.bind(event.address)
+  internalMapTransfer(
+    event.transaction.hash,
+    event.transaction.index,
+    event.address,
+    event.params.sender,
+    event.params.receiver,
+    event.params.value,
+    vaultContract.totalAssets(),
+    vaultContract.totalSupply(),
+    event.block.timestamp,
+    event.block.number
+  );
 }

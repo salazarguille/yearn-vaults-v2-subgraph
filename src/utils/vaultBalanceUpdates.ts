@@ -1,11 +1,4 @@
-import { BigInt, ethereum as eth } from '@graphprotocol/graph-ts';
-
-import {
-    Deposit1Call as DepositCall,
-    Transfer as TransferEvent,
-    Withdraw1Call as WithdrawCall,
-    Vault as VaultContract
-} from "../../generated/Registry/Vault";
+import { Address, BigInt, Bytes, ethereum as eth } from '@graphprotocol/graph-ts';
 
 import { 
     Transfer, 
@@ -105,6 +98,82 @@ export function createVaultUpdate(
     return vaultUpdate as VaultUpdate;
   }
 
+  export function internalMapDeposit(
+    transactionHash:Bytes,
+    transactionIndex: BigInt,
+    to:Address,
+    from: Address,
+    inputAmount: BigInt,
+    totalAssets: BigInt,
+    totalSupply: BigInt,
+    pricePerShare: BigInt,
+    blockTimestamp: BigInt,
+    blockNumber: BigInt,
+  ): void {
+    let id = buildId(transactionHash, transactionIndex);
+    let vaultAddress = to;
+  
+    let account = getOrCreateAccount(from);
+    let vault = getOrCreateVault(vaultAddress, false);
+  
+    // TODO: link this line on contract
+    let shares = totalAssets.equals(BIGINT_ZERO)
+      ? inputAmount
+      : inputAmount.times(totalSupply).div(totalAssets);
+  
+    // this is not supported by AS, yet
+    // let params: IParams = {
+    //   id: id,
+    //   vault: vault.id,
+    //   account: account.id,
+    //   amount: call.inputs._amount,
+    //   shares: shares,
+    //   timestamp: call.block.timestamp,
+    //   blockNumber: call.block.number,
+    //   type: 'Withdrawal',
+    // };
+  
+    createOperation(
+      id,
+      vault.id,
+      account.id,
+      inputAmount,
+      shares,
+      blockTimestamp,
+      blockNumber,
+      'Deposit',
+    );
+  
+    // TODO: vaultUpdate
+  
+    let vaultUpdateId = buildUpdateId(
+      vaultAddress,
+      transactionHash,
+      transactionIndex,
+    );
+  
+    createVaultUpdate(
+      vaultUpdateId,
+      blockTimestamp,
+      blockNumber,
+      // call.inputs._amount, // don't pass
+      inputAmount,
+      BIGINT_ZERO, // withdrawal doesn't change
+      // shares, // don't pass
+      shares,
+      BIGINT_ZERO, // shares burnt don't change
+      vault.id,
+      pricePerShare,
+      // earnings, // don't pass
+      // withdrawalFees, // don't pass
+      // performanceFees, // don't pass
+    );
+  
+    // TODO: accountUpdate
+    // deposit.save();
+  }
+
+  /*
 export function mapDeposit(call: DepositCall): void {
     let id = buildId(call.transaction.hash, call.transaction.index);
     let vaultAddress = call.to;
@@ -169,7 +238,68 @@ export function mapDeposit(call: DepositCall): void {
     // TODO: accountUpdate
     // deposit.save();
   }
+  */
   
+ export function internalMapWithdrawal(
+    transactionHash:Bytes,
+    transactionIndex: BigInt,
+    to:Address,
+    from: Address,
+    inputShares: BigInt,
+    totalAssets: BigInt,
+    totalSupply: BigInt,
+    pricePerShare: BigInt,
+    blockTimestamp: BigInt,
+    blockNumber: BigInt,
+  ): void {
+  let id = buildId(transactionHash, transactionIndex);
+  let vaultAddress = to;
+
+  let account = getOrCreateAccount(from);
+  let vault = getOrCreateVault(vaultAddress, false);
+
+  let amount = totalAssets
+    .times(inputShares)
+    .div(totalSupply);
+
+  createOperation(
+    id,
+    vault.id,
+    account.id,
+    amount,
+    inputShares,
+    blockTimestamp,
+    blockNumber,
+    'Withdrawal',
+  );
+
+  let vaultUpdateId = buildUpdateId(
+    vaultAddress,
+    transactionHash,
+    transactionIndex,
+  );
+
+  createVaultUpdate(
+    vaultUpdateId,
+    blockTimestamp,
+    blockNumber,
+    // call.inputs._amount, // don't pass
+    BIGINT_ZERO, // deposit doesn't change
+    amount,
+    // shares, // don't pass
+    BIGINT_ZERO, // shares minted don't change
+    inputShares,
+    vault.id,
+    pricePerShare,
+    // earnings, // don't pass
+    // withdrawalFees, // don't pass
+    // performanceFees, // don't pass
+  );
+
+  // TODO: accountUpdate
+}
+
+/*
   export function mapWithdrawal(call: WithdrawCall): void {
     let id = buildId(call.transaction.hash, call.transaction.index);
     let vaultAddress = call.to;
@@ -219,7 +349,45 @@ export function mapDeposit(call: DepositCall): void {
   
     // TODO: accountUpdate
   }
+  */
+
+ export function internalMapTransfer(
+   transactionHash:Bytes,
+  transactionIndex: BigInt,
+  address:Address,
+  from: Address,
+  to: Address,
+    value: BigInt,
+    totalAssets: BigInt,
+    totalSupply: BigInt,
+    blockTimestamp: BigInt,
+    blockNumber: BigInt,
+  ): void {
+  let id = buildId(transactionHash, transactionIndex);
+
+  let token = getOrCreateToken(address);
+  let sender = getOrCreateAccount(from);
+  let receiver = getOrCreateAccount(to);
+
+  let transfer = new Transfer(id.toString());
+  transfer.from = sender.id;
+  transfer.to = receiver.id;
+
+  transfer.token = token.id;
+  transfer.shares = value;
+  transfer.amount = totalAssets
+    .times(value)
+    .div(totalSupply);
+
+  transfer.timestamp = blockTimestamp;
+  transfer.blockNumber = blockNumber;
+
+  // TODO: accountUpdate
+
+  transfer.save();
+}
   
+/*
   export function mapTransfer(event: TransferEvent): void {
     let id = buildId(event.transaction.hash, event.transaction.index);
   
@@ -247,3 +415,4 @@ export function mapDeposit(call: DepositCall): void {
   
     transfer.save();
   }
+  */

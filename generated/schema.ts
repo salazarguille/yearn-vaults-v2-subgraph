@@ -817,17 +817,17 @@ export class Vault extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id !== null, "Cannot save Token entity without an ID");
+    assert(id !== null, "Cannot save Vault entity without an ID");
     assert(
       id.kind == ValueKind.STRING,
-      "Cannot save Token entity with non-string ID. " +
+      "Cannot save Vault entity with non-string ID. " +
         'Considering using .toHex() to convert the "id" to a string.'
     );
-    store.set("Token", id.toString(), this);
+    store.set("Vault", id.toString(), this);
   }
 
-  static load(id: string): Token | null {
-    return store.get("Token", id) as Token | null;
+  static load(id: string): Vault | null {
+    return store.get("Vault", id) as Vault | null;
   }
 
   get id(): string {
@@ -837,39 +837,6 @@ export class Vault extends Entity {
 
   set id(value: string) {
     this.set("id", Value.fromString(value));
-  }
-
-  get address(): Bytes {
-    let value = this.get("address");
-    return value.toBytes();
-  }
-
-  set address(value: Bytes) {
-    this.set("address", Value.fromBytes(value));
-  }
-
-  get decimals(): i32 {
-    let value = this.get("decimals");
-    return value.toI32();
-  }
-
-  get shareToken(): string {
-    let value = this.get("shareToken");
-    return value.toString();
-  }
-}
-
-  set shareToken(value: string) {
-    this.set("shareToken", Value.fromString(value));
-  }
-
-  get token(): string {
-    let value = this.get("token");
-    return value.toString();
-  }
-
-  set token(value: string) {
-    this.set("token", Value.fromString(value));
   }
 
   get transaction(): string {
@@ -888,6 +855,42 @@ export class Vault extends Entity {
 
   set status(value: string) {
     this.set("status", Value.fromString(value));
+  }
+
+  get shareToken(): string {
+    let value = this.get("shareToken");
+    return value.toString();
+  }
+
+  set shareToken(value: string) {
+    this.set("shareToken", Value.fromString(value));
+  }
+
+  get token(): string {
+    let value = this.get("token");
+    return value.toString();
+  }
+
+  set token(value: string) {
+    this.set("token", Value.fromString(value));
+  }
+
+  get apiVersion(): string {
+    let value = this.get("apiVersion");
+    return value.toString();
+  }
+
+  set apiVersion(value: string) {
+    this.set("apiVersion", Value.fromString(value));
+  }
+
+  get deploymentId(): BigInt {
+    let value = this.get("deploymentId");
+    return value.toBigInt();
+  }
+
+  set deploymentId(value: BigInt) {
+    this.set("deploymentId", Value.fromBigInt(value));
   }
 
   get blockNumber(): BigInt {
@@ -933,24 +936,6 @@ export class Vault extends Entity {
 
   set vaultUpdates(value: Array<string | null>) {
     this.set("vaultUpdates", Value.fromStringArray(value));
-  }
-
-  get creationTimestamp(): BigInt {
-    let value = this.get("creationTimestamp");
-    return value.toBigInt();
-  }
-
-  set creationTimestamp(value: BigInt) {
-    this.set("creationTimestamp", Value.fromBigInt(value));
-  }
-
-  get strategies(): Array<string> {
-    let value = this.get("strategies");
-    return value.toStringArray();
-  }
-
-  set strategies(value: Array<string>) {
-    this.set("strategies", Value.fromStringArray(value));
   }
 }
 

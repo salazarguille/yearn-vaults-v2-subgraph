@@ -38,14 +38,14 @@ dataSources:
     name: yvUSDC
     network: {{network}}
     source:
-      startBlock: 11393953
+      startBlock: 11390000
       address: '0xe2F6b9773BF3A015E2aA70741Bde1498bdB9425b'
       abi: Vault
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.3
       language: wasm/assemblyscript
-      file: ./src/mappings/vaultMappings.ts
+      file: ./src/mappings/vaults/yvUSDCVaultMappings.ts
       entities:
         - Vault
         - EthTransaction
@@ -80,14 +80,14 @@ dataSources:
     name: yvDAI
     network: {{network}}
     source:
-      startBlock: 11394020
+      startBlock: 11390000
       address: '0xBFa4D8AA6d8a379aBFe7793399D3DdaCC5bBECBB'
       abi: Vault
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.3
       language: wasm/assemblyscript
-      file: ./src/mappings/vaultMappings.ts
+      file: ./src/mappings/vaults/yvDAIVaultMappings.ts
       entities:
         - Vault
         - EthTransaction
