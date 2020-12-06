@@ -5,7 +5,7 @@ import {
   NewExperimentalVault as NewExperimentalVaultEvent,
 } from "../../generated/Registry/Registry";
 import { createEthTransaction } from "../utils/commons";
-import { createVault, releaseVault } from "../utils/registry-commons";
+import { createVault, releaseVault } from "../utils/vault";
 
 export function handleNewRelease(event: NewReleaseEvent): void {
   releaseVault(

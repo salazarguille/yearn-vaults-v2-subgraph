@@ -213,9 +213,12 @@ type Vault @entity {
   "Timestamp the vault information was most recently updated."
   timestamp: BigInt!
   "Creation timestamp"
-  creationTimestamp: BigInt!
+  activation: BigInt!
   "The strategies associated to this vault."
   strategies: [Strategy!]!
+
+  "Vault stats"
+  vaultUpdates: [VaultUpdate]!
 }
 
 enum StrategyStatus {

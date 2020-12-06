@@ -2,9 +2,17 @@ import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
 import {
   StrategyAdded as StrategyAddedEvent,
   StrategyReported as StrategyReportedEvent,
+  DepositCall,
+  Transfer as TransferEvent,
+  WithdrawCall,
 } from "../../generated/Registry/Vault";
 import { Strategy, StrategyReport, Vault } from "../../generated/schema";
-import { buildId, createEthTransaction, getTimestampInMillis } from "../utils/commons";
+import {
+  mapDeposit,
+  mapTransfer,
+  mapWithdrawal,
+} from "../utils/vaultBalanceUpdates";
+import { buildIdFromEvent, createEthTransaction, getTimestampInMillis } from "../utils/commons";
 
 export function createStrategyReport(
   transactionId: string,
@@ -18,7 +26,7 @@ export function createStrategyReport(
   debtLimit: BigInt,
   event: ethereum.Event
 ): StrategyReport {
-  let id = buildId(event)
+  let id = buildIdFromEvent(event)
   let entity = new StrategyReport(id)
   entity.strategy = strategyId
   entity.transaction = transactionId
@@ -79,18 +87,21 @@ export function createStrategy(
   event: ethereum.Event
 ): Strategy {
   let id = strategy.toHexString()
-  let entity = new Strategy(id)
-  entity.transaction = transactionId
-  entity.strategy = strategy
-  entity.vault = vault
-  entity.reports = []
-  entity.debtLimit = debtLimit
-  entity.rateLimit = rateLimit
-  entity.performanceFee = performanceFee
-  entity.blockNumber = event.block.number
-  entity.timestamp = getTimestampInMillis(event)
-  entity.save()
-  return entity
+  let strategyEntity = new Strategy(id)
+  strategyEntity.transaction = transactionId
+  strategyEntity.address = strategy
+  // TODO: can we use vaultId directly instead of loading Vault?
+  let vaultId = vault.toHexString();
+  let vaultEntity = Vault.load(vaultId);
+  strategyEntity.vault = vaultEntity.id;
+  strategyEntity.reports = []
+  strategyEntity.debtLimit = debtLimit
+  strategyEntity.rateLimit = rateLimit
+  strategyEntity.performanceFee = performanceFee
+  strategyEntity.blockNumber = event.block.number
+  strategyEntity.timestamp = getTimestampInMillis(event)
+  strategyEntity.save()
+  return strategyEntity
 }
 
 export function addStrategyToVault(
@@ -149,4 +160,19 @@ export function handleStrategyReported(event: StrategyReportedEvent): void {
     event.params.debtLimit,
     event,
   )
+}
+
+
+//  VAULT BALANCE UPDATES
+
+export function handleDeposit(call: DepositCall): void {
+  mapDeposit(call);
+}
+
+export function handleWithdrawal(call: WithdrawCall): void {
+ mapWithdrawal(call);
+}
+
+export function handleTransfer(event: TransferEvent): void {
+  mapTransfer(event);
 }

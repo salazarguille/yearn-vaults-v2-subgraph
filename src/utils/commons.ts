@@ -1,4 +1,4 @@
-import { log, BigInt, ethereum, Bytes } from "@graphprotocol/graph-ts";
+import { log, Address, BigInt, ethereum, Bytes } from "@graphprotocol/graph-ts";
 import {
   EthTransaction,
 } from "../../generated/schema";
@@ -11,11 +11,32 @@ export function getTimeInMillis(time: BigInt): BigInt {
   return time.times(BigInt.fromI32(1000));
 }
 
+// make a derived ID from transaction hash and big number
+export function buildId(tx: Bytes, n: BigInt): string {
+  return tx.toHexString().concat('-').concat(n.toString());
+}
+
+export function buildIdFromEvent(event: ethereum.Event): string {
+  return event.transaction.hash.toHex() + "-" + event.logIndex.toString();
+}
+
+export function buildBlockId(block: ethereum.Block): string {
+  return block.hash.toHex() + "-" + block.number.toString() + "-" + block.timestamp.toString();
+}
+
+
+export function buildUpdateId(address: Address, tx: Bytes, n: BigInt): string {
+  return address
+    .toHexString()
+    .concat('-')
+    .concat(tx.toHexString().concat('-').concat(n.toString()));
+}
+
 export function createEthTransaction(
   event: ethereum.Event,
   action: string
 ): EthTransaction {
-  let id = event.transaction.hash.toHex() + "-" + event.logIndex.toString();
+  let id = buildIdFromEvent(event);
   log.info("Creating EthTransaction with id {}", [id]);
   let entity = new EthTransaction(id);
   entity.event = action;
@@ -34,10 +55,9 @@ export function createEthTransaction(
   return entity;
 }
 
-export function buildId(event: ethereum.Event): string {
-  return event.transaction.hash.toHex() + "-" + event.logIndex.toString();
-}
 
-export function buildBlockId(block: ethereum.Block): string {
-  return block.hash.toHex() + "-" + block.number.toString() + "-" + block.timestamp.toString();
-}
+
+
+
+
+

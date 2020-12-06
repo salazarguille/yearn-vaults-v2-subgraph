@@ -47,11 +47,27 @@ templates:
       entities:
         - Vault
         - Strategy
+        - VaultUpdate
+        - Operation
+        - Transfer
+        - Account
+        - AccountUpdate
+        - AccountVaultBalance
+        - Token
       abis:
         - name: Vault
           file: ./abis/Vault.json
+        - name: ERC20
+          file: ./abis/ERC20Detailed.json
       eventHandlers:
         - event: StrategyAdded(indexed address,uint256,uint256,uint256)
           handler: handleStrategyAdded
         - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleStrategyReported
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      callHandlers:
+        - function: deposit(uint256)
+          handler: handleDeposit
+        - function: withdraw(uint256)
+          handler: handleWithdrawal
