@@ -2,9 +2,19 @@ import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
 import {
   StrategyAdded as StrategyAddedEvent,
   StrategyReported as StrategyReportedEvent,
+  Deposit1Call as DepositCall,
+  Transfer as TransferEvent,
+  Withdraw1Call as WithdrawCall,
+  Vault as VaultContract,
 } from "../../generated/Registry/Vault";
 import { Strategy, StrategyReport, Vault } from "../../generated/schema";
-import { buildId, createEthTransaction, getTimestampInMillis } from "../utils/commons";
+import {
+  internalMapDeposit,
+  internalMapTransfer,
+  internalMapWithdrawal,
+} from "../utils/vaultBalanceUpdates";
+import { buildIdFromEvent, createEthTransaction, getTimestampInMillis } from "../utils/commons";
+import { getOrCreateVault } from "../utils/vault";
 
 export function createStrategyReport(
   transactionId: string,
@@ -18,7 +28,7 @@ export function createStrategyReport(
   debtLimit: BigInt,
   event: ethereum.Event
 ): StrategyReport {
-  let id = buildId(event)
+  let id = buildIdFromEvent(event)
   let entity = new StrategyReport(id)
   entity.strategy = strategyId
   entity.transaction = transactionId
@@ -81,9 +91,10 @@ export function createStrategy(
   let id = strategy.toHexString()
   let entity = new Strategy(id)
   entity.transaction = transactionId
-  entity.strategy = strategy
-  entity.vault = vault
+  entity.address = strategy
+  entity.vault = vault.toHexString()
   entity.reports = []
+  entity.harvests = []
   entity.debtLimit = debtLimit
   entity.rateLimit = rateLimit
   entity.performanceFee = performanceFee
@@ -102,8 +113,7 @@ export function addStrategyToVault(
   rateLimit: BigInt,
   event: ethereum.Event,
 ): void {
-  let id = vaultAddress.toHexString()
-  let entity = Vault.load(id)
+  let entity = getOrCreateVault(vaultAddress, false)
   if(entity !== null) {
     let newStrategy = createStrategy(
       transactionId,
@@ -149,4 +159,55 @@ export function handleStrategyReported(event: StrategyReportedEvent): void {
     event.params.debtLimit,
     event,
   )
+}
+
+
+//  VAULT BALANCE UPDATES
+
+export function handleDeposit(call: DepositCall): void {
+  let vaultContract = VaultContract.bind(call.to)
+  internalMapDeposit(
+    call.transaction.hash,
+    call.transaction.index,
+    call.to,
+    call.from,
+    call.inputs._amount,
+    vaultContract.totalAssets(),
+    vaultContract.totalSupply(),
+    vaultContract.pricePerShare(),
+    call.block.timestamp,
+    call.block.number
+  );
+}
+
+export function handleWithdrawal(call: WithdrawCall): void {
+  let vaultContract = VaultContract.bind(call.to)
+ internalMapWithdrawal(
+  call.transaction.hash,
+  call.transaction.index,
+  call.to,
+  call.from,
+  call.inputs._shares,
+  vaultContract.totalAssets(),
+  vaultContract.totalSupply(),
+  vaultContract.pricePerShare(),
+  call.block.timestamp,
+  call.block.number
+ );
+}
+
+export function handleTransfer(event: TransferEvent): void {
+  let vaultContract = VaultContract.bind(event.address)
+  internalMapTransfer(
+    event.transaction.hash,
+    event.transaction.index,
+    event.address,
+    event.params.sender,
+    event.params.receiver,
+    event.params.value,
+    vaultContract.totalAssets(),
+    vaultContract.totalSupply(),
+    event.block.timestamp,
+    event.block.number
+  );
 }
