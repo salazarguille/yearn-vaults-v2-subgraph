@@ -2,9 +2,9 @@ import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
 import {
   StrategyAdded as StrategyAddedEvent,
   StrategyReported as StrategyReportedEvent,
-  DepositCall,
+  Deposit1Call as DepositCall,
   Transfer as TransferEvent,
-  WithdrawCall,
+  Withdraw1Call as WithdrawCall,
 } from "../../generated/Registry/Vault";
 import { Strategy, StrategyReport, Vault } from "../../generated/schema";
 import {
