@@ -141,7 +141,7 @@ type Deposit @entity {
   "Transaction-Log"
   id: ID!
   "Account making Deposit"
-  account: Bytes!
+  account: Account!
   "Vault deposited into"
   vault: Vault!
   "Number of Tokens deposited into Vault"
@@ -157,7 +157,7 @@ type Withdrawal @entity {
   "Transaction-Log"
   id: ID!
   "Account making Deposit"
-  account: Bytes!
+  account: Account!
   "Vault withdrawn from"
   vault: Vault!
   "Number of Tokens withdrawn from Vault"
@@ -213,9 +213,11 @@ type AccountVaultPosition @entity {
 type AccountVaultPositionUpdate @entity {
   "Account-Transaction-Log"
   id: ID!
+  "Timestamp"
   timestamp: BigInt!
+  "Block number"
   blockNumber: BigInt!
-  
+  "The Account this update applies to"
   account: Account!
 
   "Share balance"
@@ -224,9 +226,9 @@ type AccountVaultPositionUpdate @entity {
   tokenBalance: BigInt!
     
   "Total token deposits"
-  deposits: BigInt!
+  depositsTotal: BigInt!
   "Total token withdrawals"
-  withdrawals: BigInt!
+  withdrawalsTotal: BigInt!
 
   "Total share tokens minted"
   sharesMinted: BigInt!
@@ -238,9 +240,9 @@ type AccountVaultPositionUpdate @entity {
   "Total tokens received"
   tokensReceived: BigInt!
 
-  "Total share tokens (ytoken) sent"
+  "Total share tokens sent"
   sharesSent: BigInt!
-  "Total share tokens (ytoken) received"
+  "Total share tokens received"
   sharesReceived: BigInt!
 
   "The ETH transaction for this update"
@@ -276,7 +278,7 @@ type Strategy @entity {
   reports: [StrategyReport!]!
 
   "harvest() calls"
-  harvests: [Harvest!]! #@derivedFrom(field: "strategy") is this needed?
+  harvests: [Harvest!]! @derivedFrom(field: "strategy")
 }
 
 type StrategyReport @entity {
