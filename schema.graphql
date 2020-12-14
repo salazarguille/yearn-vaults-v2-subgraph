@@ -44,6 +44,23 @@ enum VaultStatus {
   Retired # This Vault has been deprecated and is unwinding/has deposits disabled/should not be used
 }
 
+type VaultRelease {
+  "Release index in Registry contract"
+  id: ID!
+  "Version string"
+  version: String!
+  "Contract address"
+  contract: Bytes!
+  "Vault deployments of this release version"
+  vaults: [Vault!]! @derivedFrom(field: "release")
+  "Timestamp of Release"
+  timestamp: BigInt!
+  "Block number of Release"
+  blockNumber: BigInt!
+  "Ethereum Transaction"
+  transaction: EthTransaction!
+}
+
 # TODO
 # emergency shutdown
 # withdrawal queue
@@ -58,10 +75,8 @@ type Vault @entity {
   status: VaultStatus!
   "Vault classification"
   classification: VaultClassification!
-  "Release Template Contract Address"
-  releaseTemplate: Bytes!
-  "Release Version"
-  releaseVersion: String!
+  "Release Information"
+  release: Release!
   "Latest Vault Update"
   latestUpdate: VaultUpdate!
   "All Vault Updates"
@@ -74,7 +89,7 @@ type Vault @entity {
   withdrawals: [Withdrawal!]! @derivedFrom(field: "vault")
   "Transfers of Vault Shares"
   transfers: [Transfer!]! @derivedFrom(field: "vault")
-  "The ETH transaction when the Strategy was indexed"
+  "Ethereum Transaction"
   transaction: EthTransaction!
   "Tags attached to the Vault"
   tags: [String!]!
@@ -87,7 +102,7 @@ type VaultUpdate @entity {
   timestamp: BigInt!
   "Block number of update"
   blockNumber: BigInt!
-  "The ETH transaction for this update"
+  "Ethereum Transaction"
   transaction: EthTransaction!
   "Vault this update is for"
   vault: Vault!
@@ -175,7 +190,7 @@ type Deposit @entity {
   tokenAmount: BigInt!
   "Number of new Vault Shares minted"
   sharesMinted: BigInt!
-  "The ETH transaction for this Deposit"
+  "Ethereum Transaction"
   transaction: EthTransaction!
 }
 
@@ -190,7 +205,7 @@ type Withdrawal @entity {
   tokenAmount: BigInt!
   "Number of Vault Shares burnt"
   sharesBurnt: BigInt!
-  "The ETH transaction for this Withdrawal"
+  "Ethereum Transaction"
   transaction: EthTransaction!
 }
 
@@ -215,7 +230,7 @@ type Transfer @entity {
   timestamp: BigInt!
   "Block number of Transfer"
   blockNumber: BigInt!
-  "The ETH transaction for this Transfer"
+  "Ethereum Transaction"
   transaction: EthTransaction!
 }
 
@@ -271,7 +286,7 @@ type AccountVaultPositionUpdate @entity {
   "Total share tokens received"
   totalSharesReceived: BigInt!
 
-  "The ETH transaction for this update"
+  "Ethereum Transaction"
   transaction: EthTransaction!
 }
 
@@ -283,7 +298,7 @@ enum StrategyStatus {
 type Strategy @entity {
   "The Strategy ID."
   id: ID!
-  "The ETH transaction when the Strategy was indexed"
+  "Ethereum Transaction"
   transaction: EthTransaction!
   "The Strategy address."
   address: Bytes!
@@ -312,7 +327,7 @@ type Strategy @entity {
 type StrategyReport @entity {
   "The Strategy Report ID."
   id: ID!
-  "The ETH transaction when the event was emitted."
+  "Ethereum Transaction"
   transaction: EthTransaction!
   "The Strategy reference."
   strategy: Strategy! @relation
