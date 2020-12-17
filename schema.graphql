@@ -1,174 +1,11 @@
-enum VaultStatus {
-  Added
-  Released
-  Endorsed
-  Experimental
-}
+##### SCHEMA GUIDELINES
+## Naming Conventions
+# Certain prefixes may be used to indicate a particular type of value.
+#   * total - indicates this is a cumulative value (e.g. totalSharesMinted, totalGrossReturns)
+#   * balance - indicates this is a spot balance (e.g. balanceTokensInvested, balanceTokensIdle)
+# Use plurals when referring to Tokens or Shares (e.g. totalShares, balanceTokens)
 
-# interface for user and vault balances
-interface BalanceUpdate {
-  id: ID!
-  timestamp: BigInt!
-  blockNumber: BigInt!
-
-  "Deposit (want) token balance"
-  balance: BigInt!
-  "Total (want) token deposits"
-  deposits: BigInt!
-  "Total (want) token withdrawals"
-  withdrawals: BigInt!
-
-  "Share token (ytoken) balance"
-  shareBalance: BigInt!
-  "Total share tokens (ytoken) minted"
-  sharesMinted: BigInt!
-  "Total share tokens (ytoken) burnt"
-  sharesBurnt: BigInt!
-}
-
-type VaultUpdate implements BalanceUpdate @entity {
-  "Vault-Transaction-Log"
-  id: ID!
-  timestamp: BigInt!
-  blockNumber: BigInt!
-
-  "Deposit (want) token balance"
-  balance: BigInt!
-  "Total (want) token deposits"
-  deposits: BigInt!
-  "Total (want) token withdrawals"
-  withdrawals: BigInt!
-
-  "Share token (ytoken) balance - totalSupply()"
-  shareBalance: BigInt!
-  "Total share tokens (ytoken) minted"
-  sharesMinted: BigInt!
-  "Total share tokens (ytoken) burnt"
-  sharesBurnt: BigInt!
-
-  vault: Vault!
-
-  "Share token (ytoken) price denominated to (want) token"
-  pricePerFullShare: BigInt!
-  # TODO: (?) denominated to
-  "Total (withdrawal + performance) fees"
-  earnings: BigInt!
-  # TODO: (?) denominated to
-  "Total withdrawal fees"
-  withdrawalFees: BigInt!
-  # TODO: (?) denominated to
-  "Total performance fees"
-  performanceFees: BigInt!
-}
-
-type AccountUpdate implements BalanceUpdate @entity {
-  "Account-Transaction-Log"
-  id: ID!
-  timestamp: BigInt!
-  blockNumber: BigInt!
-
-  "Deposit (want) token balance"
-  balance: BigInt!
-  "Total (want) token deposits"
-  deposits: BigInt!
-  "Total (want) token withdrawals"
-  withdrawals: BigInt!
-
-  "Share token (ytoken) balance"
-  shareBalance: BigInt!
-  "Total share tokens (ytoken) minted"
-  sharesMinted: BigInt!
-  "Total share tokens (ytoken) burnt"
-  sharesBurnt: BigInt!
-
-  account: Account!
-
-  "Total (want) tokens sent"
-  sent: BigInt!
-  "Total (want) tokens received"
-  received: BigInt!
-
-  "Total share tokens (ytoken) sent"
-  sharesSent: BigInt!
-  "Total share tokens (ytoken) received"
-  sharesReceived: BigInt!
-}
-
-type Account @entity {
-  "Account address"
-  id: ID!
-
-  # FIXME: Uncomment
-  # "Vault deposits"
-  # deposits: [Deposit!]! @derivedFrom(field: "account")
-  # FIXME: Uncomment
-  # "Vault withdrawals"
-  # withdrawals: [Withdrawal!]! @derivedFrom(field: "account")
-  # FIXME: Uncomment
-  # vaultBalances: [AccountVaultBalance!]! @derivedFrom(field: "account")
-
-  # FIXME: Uncomment
-  # "Incoming transfers"
-  # received: [Transfer!]! @derivedFrom(field: "to")
-  # FIXME: Uncomment
-  # "Outgoing transfers"
-  # sent: [Transfer!]! @derivedFrom(field: "from")
-}
-
-type AccountVaultBalance @entity {
-  "Account-Vault"
-  id: ID!
-  vault: Vault!
-  account: Account!
-  "Deposit (want) token info"
-  token: Token!
-  "Share token (ytoken) info"
-  shareToken: Token!
-
-  "Account stats"
-  accountUpdates: [AccountUpdate!]!
-}
-
-type Transfer @entity {
-  "Transaction-Log"
-  id: ID!
-  "Sender"
-  from: Account!
-  "Receiver"
-  to: Account!
-  "Share token (ytoken) amount"
-  shares: BigInt!
-  "Share token (ytoken) amount denominated to (want) token"
-  amount: BigInt!
-
-  token: Token!
-  timestamp: BigInt!
-  blockNumber: BigInt!
-}
-
-enum OperationType {
-  Withdrawal
-  Deposit
-}
-
-type Operation @entity {
-  "Transaction-Log"
-  id: ID!
-  vault: Vault!
-  account: Account!
-  "Deposit/Withdrawal (want) token amount"
-  amount: BigInt!
-  "Share token (ytoken) amount"
-  shares: BigInt!
-  timestamp: BigInt!
-  blockNumber: BigInt!
-  "Deposit or Withdrawal"
-  type: OperationType!
-
-  # (!) VaultUpdate is created on Deposit
-  # vaultStats: VaultUpdate!
-}
-
+# TODO document fields
 type EthTransaction @entity {
   id: ID!
   event: String!
@@ -188,38 +25,269 @@ type EthTransaction @entity {
 type Token @entity {
   "Token address"
   id: ID!
-  address: Bytes!
+  "Number of decimals for this Token"
   decimals: Int!
+  "Name of the Token"
   name: String!
+  "Symbol of the Token"
   symbol: String!
 }
 
-type Vault @entity {
-  "The Vault ID."
-  id: ID!
-  "The ETH transaction when the event was emitted."
-  transaction: EthTransaction!
-  "Indicates the current vault status."
-  status: VaultStatus!
-  "The share token (yToken) information"
-  shareToken: Token!
-  "The deposit want token information."
-  token: Token!
-  "The API version."
-  apiVersion: String!
-  "The deployment ID."
-  deploymentId: BigInt!
-  "Blocknumber the vault information was most recently updated."
-  blockNumber: BigInt!
-  "Timestamp the vault information was most recently updated."
-  timestamp: BigInt!
-  "Creation timestamp"
-  activation: BigInt!
-  "The strategies associated to this vault."
-  strategies: [Strategy!]!
+enum VaultClassification {
+  Endorsed
+  Experimental
+}
 
-  "Vault stats"
-  vaultUpdates: [VaultUpdate]!
+enum VaultStatus {
+  Latest # This Vault is the latest release for a given Token
+  Active # This Vault is not the latest release for a given Token, but is healthy and safe
+  Retired # This Vault has been deprecated and is unwinding/has deposits disabled/should not be used
+}
+
+type VaultRelease {
+  "Release index in Registry contract"
+  id: ID!
+  "Version string"
+  version: String!
+  "Contract address"
+  contract: Bytes!
+  "Vault deployments of this release version"
+  vaults: [Vault!]! @derivedFrom(field: "release")
+  "Timestamp of Release"
+  timestamp: BigInt!
+  "Block number of Release"
+  blockNumber: BigInt!
+  "Ethereum Transaction"
+  transaction: EthTransaction!
+}
+
+# TODO
+# emergency shutdown
+# withdrawal queue
+type Vault @entity {
+  "Vault address"
+  id: ID!
+  "Token this Vault will accrue"
+  token: Token!
+  "Token representing Shares in the Vault"
+  shareToken: Token!
+  "Vault status"
+  status: VaultStatus!
+  "Vault classification"
+  classification: VaultClassification!
+  "Release Information"
+  release: Release!
+  "Latest Vault Update"
+  latestUpdate: VaultUpdate!
+  "All Vault Updates"
+  historicalUpdates: [VaultUpdate!]! @derivedFrom(field: "vault")
+  "Strategies for this Vault"
+  strategies: [Strategy!]! @derivedFrom(field: "vault")
+  "Token deposits into the Vault"
+  deposits: [Deposit!]! @derivedFrom(field: "vault")
+  "Token withdrawals from the Vault"
+  withdrawals: [Withdrawal!]! @derivedFrom(field: "vault")
+  "Transfers of Vault Shares"
+  transfers: [Transfer!]! @derivedFrom(field: "vault")
+  "Ethereum Transaction"
+  transaction: EthTransaction!
+  "Tags attached to the Vault"
+  tags: [String!]!
+}
+
+type VaultUpdate @entity {
+  "Vault-Transaction-Log"
+  id: ID!
+  "Timestamp of update"
+  timestamp: BigInt!
+  "Block number of update"
+  blockNumber: BigInt!
+  "Ethereum Transaction"
+  transaction: EthTransaction!
+  "Vault this update is for"
+  vault: Vault!
+
+  ### BALANCES AND SHARES
+
+  "Balance of Tokens in the Vault and its Strategies"
+  balanceTokens: BigInt!
+  "Current idle Token balance"
+  bakanceTokensIdle: BigInt! # Tokens in the Vault contract
+  "Balance of Tokens invested into Strategies"
+  balanceTokensInvested: BigInt!
+  "Sum of all Deposits over time"
+  totalTokensDeposited: BigInt!
+  "Sum of all Withdrawals over time"
+  totalTokensWithdrawn: BigInt!
+  "Deposit limit for Tokens in the Vault"
+  tokensDepositLimit: BigInt!
+  "Current supply of Shares"
+  sharesSupply: BigInt!
+  "Sum of Shares minted over all time"
+  totalSharesMinted: BigInt!
+  "Sum of Shares burnt over all time"
+  totalSharesBurnt: BigInt!
+  
+  ### PERFORMANCE
+
+  "Current price per full share"
+  pricePerShare: BigInt!
+  #### TODO Awaiting updated Vault Yield-Oracles
+  # "12-day EMA of Vault APY as reported by built-in Yield Oracle"
+  # apy12dEMA: Int!
+  # "50-day EMA of Vault APY as reported by built-in Yield Oracle"
+  # apy50dEMA: Int!
+  
+  # TODO nomenclature returns vs performance
+  "Total returns before fees in Tokens"
+  totalReturnsBeforeFees: BigInt!
+  "Total returns after fees in Tokens"
+  totalReturnsAfterFees: BigInt!
+
+  ### FEES
+  "Total fees generated by Vault in Tokens"
+  totalFees: BigInt!
+  "Total management fee revenue in Tokens"
+  totalManagementFees: BigInt!
+  "Total performance fee revenue in Tokens"
+  totalPerformanceFees: BigInt!
+  "Total Treasury component of Performance Fee"
+  totalPerformanceTreasuryFees: BigInt!
+  "Total Strategist component of Performance Fee"
+  totalPerformanceStrategistFees: BigInt!
+
+  "Management fee in basis points"
+  managementFeeBps: Int!
+  "Performance fee in basis points"
+  performanceFeeBps: Int!
+}
+
+type Account @entity {
+  "Account address"
+  id: ID!
+
+  "Vault deposits"
+  deposits: [Deposit!]! @derivedFrom(field: "account")
+  "Vault withdrawals"
+  withdrawals: [Withdrawal!]! @derivedFrom(field: "account")
+  "Vault positions"
+  vaultPositions: [AccountVaultPosition!]! @derivedFrom(field: "account")
+
+  "Incoming share transfers"
+  sharesReceived: [Transfer!]! @derivedFrom(field: "to")
+  "Outgoing share transfers"
+  sharesSent: [Transfer!]! @derivedFrom(field: "from")
+}
+
+type Deposit @entity {
+  "Transaction-Log"
+  id: ID!
+  "Account making Deposit"
+  account: Account!
+  "Vault deposited into"
+  vault: Vault!
+  "Number of Tokens deposited into Vault"
+  tokenAmount: BigInt!
+  "Number of new Vault Shares minted"
+  sharesMinted: BigInt!
+  "Ethereum Transaction"
+  transaction: EthTransaction!
+}
+
+type Withdrawal @entity {
+  "Transaction-Log"
+  id: ID!
+  "Account making Deposit"
+  account: Account!
+  "Vault withdrawn from"
+  vault: Vault!
+  "Number of Tokens withdrawn from Vault"
+  tokenAmount: BigInt!
+  "Number of Vault Shares burnt"
+  sharesBurnt: BigInt!
+  "Ethereum Transaction"
+  transaction: EthTransaction!
+}
+
+type Transfer @entity {
+  "Transaction-Log"
+  id: ID!
+  "Vault"
+  vault: Vault!
+  "Sender"
+  from: Account!
+  "Receiver"
+  to: Account!
+  "Vault Share Token"
+  shareToken: Token!
+  "Number of Vault Shares transferred"
+  amount: BigInt!
+  "Vault Token"
+  token: Token!
+  "Number of Tokens redeemable for shares transferred"
+  tokenAmount: BigInt!
+  "Timestamp of Transfer"
+  timestamp: BigInt!
+  "Block number of Transfer"
+  blockNumber: BigInt!
+  "Ethereum Transaction"
+  transaction: EthTransaction!
+}
+
+type AccountVaultPosition @entity {
+  "Account-Vault"
+  id: ID!
+  "Vault"
+  vault: Vault!
+  "Account"
+  account: Account!
+  "Vault token"
+  token: Token!
+  "Vault share token"
+  shareToken: Token!
+  "Latest account update for this Vault"
+  latestUpdate: AccountVaultPositionUpdate!
+  "Account updates over time"
+  historicalUpdates: [AccountVaultPositionUpdate!]!
+}
+
+type AccountVaultPositionUpdate @entity {
+  "Account-Transaction-Log"
+  id: ID!
+  "Timestamp"
+  timestamp: BigInt!
+  "Block number"
+  blockNumber: BigInt!
+  "The Account this update applies to"
+  account: Account!
+
+  "Share balance"
+  balanceShares: BigInt!
+  "Token balance"
+  balanceTokens: BigInt!
+    
+  "Total token deposits"
+  totalDeposits: BigInt!
+  "Total token withdrawals"
+  totalWithdrawals: BigInt!
+
+  "Total share tokens minted"
+  totalSharesMinted: BigInt!
+  "Total share tokens burnt"
+  totalSharesBurnt: BigInt!
+
+  "Total tokens sent"
+  totalTokensSent: BigInt!
+  "Total tokens received"
+  totalTokensReceived: BigInt!
+
+  "Total share tokens sent"
+  totalSharesSent: BigInt!
+  "Total share tokens received"
+  totalSharesReceived: BigInt!
+
+  "Ethereum Transaction"
+  transaction: EthTransaction!
 }
 
 enum StrategyStatus {
@@ -230,7 +298,7 @@ enum StrategyStatus {
 type Strategy @entity {
   "The Strategy ID."
   id: ID!
-  "The ETH transaction when the event was emitted."
+  "Ethereum Transaction"
   transaction: EthTransaction!
   "The Strategy address."
   address: Bytes!
@@ -241,7 +309,7 @@ type Strategy @entity {
   "It is the current rate limit. It increases/decreases per block."
   rateLimit: BigInt!
   "Defines the strategist's fee (basis points)."
-  performanceFee: BigInt!
+  performanceFeeBps: Int!
   "Blocknumber the vault information was most recently updated."
   blockNumber: BigInt!
   "Timestamp the vault information was most recently updated."
@@ -249,15 +317,17 @@ type Strategy @entity {
 
   "The reports created by this strategy."
   reports: [StrategyReport!]!
+  "The latest report for this Strategy"
+  latestReport: StrategyReport!
 
   "harvest() calls"
-  harvests: [Harvest!]! #@derivedFrom(field: "strategy") is this needed?
+  harvests: [Harvest!]! @derivedFrom(field: "strategy")
 }
 
 type StrategyReport @entity {
   "The Strategy Report ID."
   id: ID!
-  "The ETH transaction when the event was emitted."
+  "Ethereum Transaction"
   transaction: EthTransaction!
   "The Strategy reference."
   strategy: Strategy! @relation
@@ -279,12 +349,8 @@ type StrategyReport @entity {
   blockNumber: BigInt!
   "Timestamp the strategy report was most recently updated."
   timestamp: BigInt!
-
-  "Vault stats"
+  "Vault state"
   vaultUpdate: VaultUpdate!
-  # "Strategy stats"
-  # TODO: is this needed?
-  # strategyUpdate: StrategyUpdate!
 }
 
 type Harvest @entity {
