@@ -12,7 +12,7 @@ import {
   BigDecimal
 } from "@graphprotocol/graph-ts";
 
-export class EthTransaction extends Entity {
+export class Transaction extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -20,17 +20,17 @@ export class EthTransaction extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id !== null, "Cannot save EthTransaction entity without an ID");
+    assert(id !== null, "Cannot save Transaction entity without an ID");
     assert(
       id.kind == ValueKind.STRING,
-      "Cannot save EthTransaction entity with non-string ID. " +
+      "Cannot save Transaction entity with non-string ID. " +
         'Considering using .toHex() to convert the "id" to a string.'
     );
-    store.set("EthTransaction", id.toString(), this);
+    store.set("Transaction", id.toString(), this);
   }
 
-  static load(id: string): EthTransaction | null {
-    return store.get("EthTransaction", id) as EthTransaction | null;
+  static load(id: string): Transaction | null {
+    return store.get("Transaction", id) as Transaction | null;
   }
 
   get id(): string {
@@ -209,6 +209,91 @@ export class Token extends Entity {
   }
 }
 
+export class VaultRelease extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save VaultRelease entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save VaultRelease entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("VaultRelease", id.toString(), this);
+  }
+
+  static load(id: string): VaultRelease | null {
+    return store.get("VaultRelease", id) as VaultRelease | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get version(): string {
+    let value = this.get("version");
+    return value.toString();
+  }
+
+  set version(value: string) {
+    this.set("version", Value.fromString(value));
+  }
+
+  get contract(): Bytes {
+    let value = this.get("contract");
+    return value.toBytes();
+  }
+
+  set contract(value: Bytes) {
+    this.set("contract", Value.fromBytes(value));
+  }
+
+  get vaults(): Array<string> {
+    let value = this.get("vaults");
+    return value.toStringArray();
+  }
+
+  set vaults(value: Array<string>) {
+    this.set("vaults", Value.fromStringArray(value));
+  }
+
+  get timestamp(): BigInt {
+    let value = this.get("timestamp");
+    return value.toBigInt();
+  }
+
+  set timestamp(value: BigInt) {
+    this.set("timestamp", Value.fromBigInt(value));
+  }
+
+  get blockNumber(): BigInt {
+    let value = this.get("blockNumber");
+    return value.toBigInt();
+  }
+
+  set blockNumber(value: BigInt) {
+    this.set("blockNumber", Value.fromBigInt(value));
+  }
+
+  get transaction(): string {
+    let value = this.get("transaction");
+    return value.toString();
+  }
+
+  set transaction(value: string) {
+    this.set("transaction", Value.fromString(value));
+  }
+}
+
 export class Vault extends Entity {
   constructor(id: string) {
     super();
@@ -275,22 +360,13 @@ export class Vault extends Entity {
     this.set("classification", Value.fromString(value));
   }
 
-  get releaseTemplate(): Bytes {
-    let value = this.get("releaseTemplate");
-    return value.toBytes();
-  }
-
-  set releaseTemplate(value: Bytes) {
-    this.set("releaseTemplate", Value.fromBytes(value));
-  }
-
-  get releaseVersion(): string {
-    let value = this.get("releaseVersion");
+  get release(): string {
+    let value = this.get("release");
     return value.toString();
   }
 
-  set releaseVersion(value: string) {
-    this.set("releaseVersion", Value.fromString(value));
+  set release(value: string) {
+    this.set("release", Value.fromString(value));
   }
 
   get latestUpdate(): string {

@@ -6,7 +6,7 @@
 # Use plurals when referring to Tokens or Shares (e.g. totalShares, balanceTokens)
 
 # TODO document fields
-type EthTransaction @entity {
+type Transaction @entity {
   id: ID!
   event: String!
   from: Bytes!
@@ -44,7 +44,7 @@ enum VaultStatus {
   Retired # This Vault has been deprecated and is unwinding/has deposits disabled/should not be used
 }
 
-type VaultRelease {
+type VaultRelease @entity {
   "Release index in Registry contract"
   id: ID!
   "Version string"
@@ -58,7 +58,7 @@ type VaultRelease {
   "Block number of Release"
   blockNumber: BigInt!
   "Ethereum Transaction"
-  transaction: EthTransaction!
+  transaction: Transaction!
 }
 
 # TODO
@@ -76,7 +76,7 @@ type Vault @entity {
   "Vault classification"
   classification: VaultClassification!
   "Release Information"
-  release: Release!
+  release: VaultRelease!
   "Latest Vault Update"
   latestUpdate: VaultUpdate!
   "All Vault Updates"
@@ -90,7 +90,7 @@ type Vault @entity {
   "Transfers of Vault Shares"
   transfers: [Transfer!]! @derivedFrom(field: "vault")
   "Ethereum Transaction"
-  transaction: EthTransaction!
+  transaction: Transaction!
   "Tags attached to the Vault"
   tags: [String!]!
 }
@@ -103,7 +103,7 @@ type VaultUpdate @entity {
   "Block number of update"
   blockNumber: BigInt!
   "Ethereum Transaction"
-  transaction: EthTransaction!
+  transaction: Transaction!
   "Vault this update is for"
   vault: Vault!
 
@@ -191,7 +191,7 @@ type Deposit @entity {
   "Number of new Vault Shares minted"
   sharesMinted: BigInt!
   "Ethereum Transaction"
-  transaction: EthTransaction!
+  transaction: Transaction!
 }
 
 type Withdrawal @entity {
@@ -206,7 +206,7 @@ type Withdrawal @entity {
   "Number of Vault Shares burnt"
   sharesBurnt: BigInt!
   "Ethereum Transaction"
-  transaction: EthTransaction!
+  transaction: Transaction!
 }
 
 type Transfer @entity {
@@ -231,7 +231,7 @@ type Transfer @entity {
   "Block number of Transfer"
   blockNumber: BigInt!
   "Ethereum Transaction"
-  transaction: EthTransaction!
+  transaction: Transaction!
 }
 
 type AccountVaultPosition @entity {
@@ -287,7 +287,7 @@ type AccountVaultPositionUpdate @entity {
   totalSharesReceived: BigInt!
 
   "Ethereum Transaction"
-  transaction: EthTransaction!
+  transaction: Transaction!
 }
 
 enum StrategyStatus {
@@ -299,7 +299,7 @@ type Strategy @entity {
   "The Strategy ID."
   id: ID!
   "Ethereum Transaction"
-  transaction: EthTransaction!
+  transaction: Transaction!
   "The Strategy address."
   address: Bytes!
   "The Vault"
@@ -328,7 +328,7 @@ type StrategyReport @entity {
   "The Strategy Report ID."
   id: ID!
   "Ethereum Transaction"
-  transaction: EthTransaction!
+  transaction: Transaction!
   "The Strategy reference."
   strategy: Strategy! @relation
   "The reported gain amount for the strategy."
