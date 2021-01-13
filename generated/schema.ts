@@ -209,91 +209,6 @@ export class Token extends Entity {
   }
 }
 
-export class VaultRelease extends Entity {
-  constructor(id: string) {
-    super();
-    this.set("id", Value.fromString(id));
-  }
-
-  save(): void {
-    let id = this.get("id");
-    assert(id !== null, "Cannot save VaultRelease entity without an ID");
-    assert(
-      id.kind == ValueKind.STRING,
-      "Cannot save VaultRelease entity with non-string ID. " +
-        'Considering using .toHex() to convert the "id" to a string.'
-    );
-    store.set("VaultRelease", id.toString(), this);
-  }
-
-  static load(id: string): VaultRelease | null {
-    return store.get("VaultRelease", id) as VaultRelease | null;
-  }
-
-  get id(): string {
-    let value = this.get("id");
-    return value.toString();
-  }
-
-  set id(value: string) {
-    this.set("id", Value.fromString(value));
-  }
-
-  get version(): string {
-    let value = this.get("version");
-    return value.toString();
-  }
-
-  set version(value: string) {
-    this.set("version", Value.fromString(value));
-  }
-
-  get contract(): Bytes {
-    let value = this.get("contract");
-    return value.toBytes();
-  }
-
-  set contract(value: Bytes) {
-    this.set("contract", Value.fromBytes(value));
-  }
-
-  get vaults(): Array<string> {
-    let value = this.get("vaults");
-    return value.toStringArray();
-  }
-
-  set vaults(value: Array<string>) {
-    this.set("vaults", Value.fromStringArray(value));
-  }
-
-  get timestamp(): BigInt {
-    let value = this.get("timestamp");
-    return value.toBigInt();
-  }
-
-  set timestamp(value: BigInt) {
-    this.set("timestamp", Value.fromBigInt(value));
-  }
-
-  get blockNumber(): BigInt {
-    let value = this.get("blockNumber");
-    return value.toBigInt();
-  }
-
-  set blockNumber(value: BigInt) {
-    this.set("blockNumber", Value.fromBigInt(value));
-  }
-
-  get transaction(): string {
-    let value = this.get("transaction");
-    return value.toString();
-  }
-
-  set transaction(value: string) {
-    this.set("transaction", Value.fromString(value));
-  }
-}
-
 export class Vault extends Entity {
   constructor(id: string) {
     super();
@@ -342,15 +257,6 @@ export class Vault extends Entity {
     this.set("shareToken", Value.fromString(value));
   }
 
-  get status(): string {
-    let value = this.get("status");
-    return value.toString();
-  }
-
-  set status(value: string) {
-    this.set("status", Value.fromString(value));
-  }
-
   get classification(): string {
     let value = this.get("classification");
     return value.toString();
@@ -358,15 +264,6 @@ export class Vault extends Entity {
 
   set classification(value: string) {
     this.set("classification", Value.fromString(value));
-  }
-
-  get release(): string {
-    let value = this.get("release");
-    return value.toString();
-  }
-
-  set release(value: string) {
-    this.set("release", Value.fromString(value));
   }
 
   get latestUpdate(): string {
@@ -517,13 +414,13 @@ export class VaultUpdate extends Entity {
     this.set("balanceTokens", Value.fromBigInt(value));
   }
 
-  get bakanceTokensIdle(): BigInt {
-    let value = this.get("bakanceTokensIdle");
+  get balanceTokensIdle(): BigInt {
+    let value = this.get("balanceTokensIdle");
     return value.toBigInt();
   }
 
-  set bakanceTokensIdle(value: BigInt) {
-    this.set("bakanceTokensIdle", Value.fromBigInt(value));
+  set balanceTokensIdle(value: BigInt) {
+    this.set("balanceTokensIdle", Value.fromBigInt(value));
   }
 
   get balanceTokensInvested(): BigInt {
