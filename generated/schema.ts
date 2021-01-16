@@ -266,15 +266,6 @@ export class Vault extends Entity {
     this.set("classification", Value.fromString(value));
   }
 
-  get latestUpdate(): string {
-    let value = this.get("latestUpdate");
-    return value.toString();
-  }
-
-  set latestUpdate(value: string) {
-    this.set("latestUpdate", Value.fromString(value));
-  }
-
   get historicalUpdates(): Array<string> {
     let value = this.get("historicalUpdates");
     return value.toStringArray();
@@ -1315,13 +1306,21 @@ export class Strategy extends Entity {
     this.set("reports", Value.fromStringArray(value));
   }
 
-  get latestReport(): string {
+  get latestReport(): string | null {
     let value = this.get("latestReport");
-    return value.toString();
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set latestReport(value: string) {
-    this.set("latestReport", Value.fromString(value));
+  set latestReport(value: string | null) {
+    if (value === null) {
+      this.unset("latestReport");
+    } else {
+      this.set("latestReport", Value.fromString(value as string));
+    }
   }
 
   get harvests(): Array<string> {
@@ -1461,15 +1460,6 @@ export class StrategyReport extends Entity {
 
   set timestamp(value: BigInt) {
     this.set("timestamp", Value.fromBigInt(value));
-  }
-
-  get vaultUpdate(): string {
-    let value = this.get("vaultUpdate");
-    return value.toString();
-  }
-
-  set vaultUpdate(value: string) {
-    this.set("vaultUpdate", Value.fromString(value));
   }
 }
 

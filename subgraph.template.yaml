@@ -62,10 +62,12 @@ templates:
       eventHandlers:
         - event: StrategyAdded(indexed address,uint256,uint256,uint256)
           handler: handleStrategyAdded
-        # - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
-        #   handler: handleStrategyReported
+        - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleStrategyReported
+        # TODO: failing in graph sync at block #11579817  
         # - event: Transfer(indexed address,indexed address,uint256)
         #   handler: handleTransfer
+      # TODO: failing in graph sync at block #11595706  
       # callHandlers:
       #   - function: deposit(uint256)
       #     handler: handleDeposit

@@ -364,8 +364,8 @@ type StrategyReport @entity {
   blockNumber: BigInt!
   "Timestamp the strategy report was most recently updated."
   timestamp: BigInt!
-  "Vault state"
-  vaultUpdate: VaultUpdate!
+  # "Vault state"
+  # vaultUpdate: VaultUpdate!
 
   #### TODO Awaiting updated Vault Yield-Oracles https://github.com/iearn-finance/yearn-vaults/pull/69
   # "12-day EMA of Vault APY as reported by built-in Yield Oracle"
