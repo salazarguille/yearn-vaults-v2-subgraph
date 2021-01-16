@@ -337,6 +337,69 @@ export class Vault extends Entity {
   set tags(value: Array<string>) {
     this.set("tags", Value.fromStringArray(value));
   }
+
+  get balanceTokens(): BigInt {
+    let value = this.get("balanceTokens");
+    return value.toBigInt();
+  }
+
+  set balanceTokens(value: BigInt) {
+    this.set("balanceTokens", Value.fromBigInt(value));
+  }
+
+  get balanceTokensIdle(): BigInt {
+    let value = this.get("balanceTokensIdle");
+    return value.toBigInt();
+  }
+
+  set balanceTokensIdle(value: BigInt) {
+    this.set("balanceTokensIdle", Value.fromBigInt(value));
+  }
+
+  get balanceTokensInvested(): BigInt {
+    let value = this.get("balanceTokensInvested");
+    return value.toBigInt();
+  }
+
+  set balanceTokensInvested(value: BigInt) {
+    this.set("balanceTokensInvested", Value.fromBigInt(value));
+  }
+
+  get tokensDepositLimit(): BigInt {
+    let value = this.get("tokensDepositLimit");
+    return value.toBigInt();
+  }
+
+  set tokensDepositLimit(value: BigInt) {
+    this.set("tokensDepositLimit", Value.fromBigInt(value));
+  }
+
+  get sharesSupply(): BigInt {
+    let value = this.get("sharesSupply");
+    return value.toBigInt();
+  }
+
+  set sharesSupply(value: BigInt) {
+    this.set("sharesSupply", Value.fromBigInt(value));
+  }
+
+  get managementFeeBps(): i32 {
+    let value = this.get("managementFeeBps");
+    return value.toI32();
+  }
+
+  set managementFeeBps(value: i32) {
+    this.set("managementFeeBps", Value.fromI32(value));
+  }
+
+  get performanceFeeBps(): i32 {
+    let value = this.get("performanceFeeBps");
+    return value.toI32();
+  }
+
+  set performanceFeeBps(value: i32) {
+    this.set("performanceFeeBps", Value.fromI32(value));
+  }
 }
 
 export class VaultUpdate extends Entity {
@@ -405,85 +468,40 @@ export class VaultUpdate extends Entity {
     this.set("vault", Value.fromString(value));
   }
 
-  get balanceTokens(): BigInt {
-    let value = this.get("balanceTokens");
+  get tokensDeposited(): BigInt {
+    let value = this.get("tokensDeposited");
     return value.toBigInt();
   }
 
-  set balanceTokens(value: BigInt) {
-    this.set("balanceTokens", Value.fromBigInt(value));
+  set tokensDeposited(value: BigInt) {
+    this.set("tokensDeposited", Value.fromBigInt(value));
   }
 
-  get balanceTokensIdle(): BigInt {
-    let value = this.get("balanceTokensIdle");
+  get tokensWithdrawn(): BigInt {
+    let value = this.get("tokensWithdrawn");
     return value.toBigInt();
   }
 
-  set balanceTokensIdle(value: BigInt) {
-    this.set("balanceTokensIdle", Value.fromBigInt(value));
+  set tokensWithdrawn(value: BigInt) {
+    this.set("tokensWithdrawn", Value.fromBigInt(value));
   }
 
-  get balanceTokensInvested(): BigInt {
-    let value = this.get("balanceTokensInvested");
+  get sharesMinted(): BigInt {
+    let value = this.get("sharesMinted");
     return value.toBigInt();
   }
 
-  set balanceTokensInvested(value: BigInt) {
-    this.set("balanceTokensInvested", Value.fromBigInt(value));
+  set sharesMinted(value: BigInt) {
+    this.set("sharesMinted", Value.fromBigInt(value));
   }
 
-  get totalTokensDeposited(): BigInt {
-    let value = this.get("totalTokensDeposited");
+  get sharesBurnt(): BigInt {
+    let value = this.get("sharesBurnt");
     return value.toBigInt();
   }
 
-  set totalTokensDeposited(value: BigInt) {
-    this.set("totalTokensDeposited", Value.fromBigInt(value));
-  }
-
-  get totalTokensWithdrawn(): BigInt {
-    let value = this.get("totalTokensWithdrawn");
-    return value.toBigInt();
-  }
-
-  set totalTokensWithdrawn(value: BigInt) {
-    this.set("totalTokensWithdrawn", Value.fromBigInt(value));
-  }
-
-  get tokensDepositLimit(): BigInt {
-    let value = this.get("tokensDepositLimit");
-    return value.toBigInt();
-  }
-
-  set tokensDepositLimit(value: BigInt) {
-    this.set("tokensDepositLimit", Value.fromBigInt(value));
-  }
-
-  get sharesSupply(): BigInt {
-    let value = this.get("sharesSupply");
-    return value.toBigInt();
-  }
-
-  set sharesSupply(value: BigInt) {
-    this.set("sharesSupply", Value.fromBigInt(value));
-  }
-
-  get totalSharesMinted(): BigInt {
-    let value = this.get("totalSharesMinted");
-    return value.toBigInt();
-  }
-
-  set totalSharesMinted(value: BigInt) {
-    this.set("totalSharesMinted", Value.fromBigInt(value));
-  }
-
-  get totalSharesBurnt(): BigInt {
-    let value = this.get("totalSharesBurnt");
-    return value.toBigInt();
-  }
-
-  set totalSharesBurnt(value: BigInt) {
-    this.set("totalSharesBurnt", Value.fromBigInt(value));
+  set sharesBurnt(value: BigInt) {
+    this.set("sharesBurnt", Value.fromBigInt(value));
   }
 
   get pricePerShare(): BigInt {
@@ -495,22 +513,13 @@ export class VaultUpdate extends Entity {
     this.set("pricePerShare", Value.fromBigInt(value));
   }
 
-  get totalReturnsBeforeFees(): BigInt {
-    let value = this.get("totalReturnsBeforeFees");
+  get returnsGenerated(): BigInt {
+    let value = this.get("returnsGenerated");
     return value.toBigInt();
   }
 
-  set totalReturnsBeforeFees(value: BigInt) {
-    this.set("totalReturnsBeforeFees", Value.fromBigInt(value));
-  }
-
-  get totalReturnsAfterFees(): BigInt {
-    let value = this.get("totalReturnsAfterFees");
-    return value.toBigInt();
-  }
-
-  set totalReturnsAfterFees(value: BigInt) {
-    this.set("totalReturnsAfterFees", Value.fromBigInt(value));
+  set returnsGenerated(value: BigInt) {
+    this.set("returnsGenerated", Value.fromBigInt(value));
   }
 
   get totalFees(): BigInt {
@@ -522,58 +531,31 @@ export class VaultUpdate extends Entity {
     this.set("totalFees", Value.fromBigInt(value));
   }
 
-  get totalManagementFees(): BigInt {
-    let value = this.get("totalManagementFees");
+  get managementFees(): BigInt {
+    let value = this.get("managementFees");
     return value.toBigInt();
   }
 
-  set totalManagementFees(value: BigInt) {
-    this.set("totalManagementFees", Value.fromBigInt(value));
+  set managementFees(value: BigInt) {
+    this.set("managementFees", Value.fromBigInt(value));
   }
 
-  get totalPerformanceFees(): BigInt {
-    let value = this.get("totalPerformanceFees");
+  get performanceFees(): BigInt {
+    let value = this.get("performanceFees");
     return value.toBigInt();
   }
 
-  set totalPerformanceFees(value: BigInt) {
-    this.set("totalPerformanceFees", Value.fromBigInt(value));
+  set performanceFees(value: BigInt) {
+    this.set("performanceFees", Value.fromBigInt(value));
   }
 
-  get totalPerformanceTreasuryFees(): BigInt {
-    let value = this.get("totalPerformanceTreasuryFees");
+  get strategistFees(): BigInt {
+    let value = this.get("strategistFees");
     return value.toBigInt();
   }
 
-  set totalPerformanceTreasuryFees(value: BigInt) {
-    this.set("totalPerformanceTreasuryFees", Value.fromBigInt(value));
-  }
-
-  get totalPerformanceStrategistFees(): BigInt {
-    let value = this.get("totalPerformanceStrategistFees");
-    return value.toBigInt();
-  }
-
-  set totalPerformanceStrategistFees(value: BigInt) {
-    this.set("totalPerformanceStrategistFees", Value.fromBigInt(value));
-  }
-
-  get managementFeeBps(): i32 {
-    let value = this.get("managementFeeBps");
-    return value.toI32();
-  }
-
-  set managementFeeBps(value: i32) {
-    this.set("managementFeeBps", Value.fromI32(value));
-  }
-
-  get performanceFeeBps(): i32 {
-    let value = this.get("performanceFeeBps");
-    return value.toI32();
-  }
-
-  set performanceFeeBps(value: i32) {
-    this.set("performanceFeeBps", Value.fromI32(value));
+  set strategistFees(value: BigInt) {
+    this.set("strategistFees", Value.fromBigInt(value));
   }
 }
 
@@ -727,6 +709,15 @@ export class Deposit extends Entity {
   set transaction(value: string) {
     this.set("transaction", Value.fromString(value));
   }
+
+  get vaultUpdate(): string {
+    let value = this.get("vaultUpdate");
+    return value.toString();
+  }
+
+  set vaultUpdate(value: string) {
+    this.set("vaultUpdate", Value.fromString(value));
+  }
 }
 
 export class Withdrawal extends Entity {
@@ -802,6 +793,15 @@ export class Withdrawal extends Entity {
 
   set transaction(value: string) {
     this.set("transaction", Value.fromString(value));
+  }
+
+  get vaultUpdate(): string {
+    let value = this.get("vaultUpdate");
+    return value.toString();
+  }
+
+  set vaultUpdate(value: string) {
+    this.set("vaultUpdate", Value.fromString(value));
   }
 }
 
@@ -1012,6 +1012,24 @@ export class AccountVaultPosition extends Entity {
   set historicalUpdates(value: Array<string>) {
     this.set("historicalUpdates", Value.fromStringArray(value));
   }
+
+  get balanceShares(): BigInt {
+    let value = this.get("balanceShares");
+    return value.toBigInt();
+  }
+
+  set balanceShares(value: BigInt) {
+    this.set("balanceShares", Value.fromBigInt(value));
+  }
+
+  get balanceTokens(): BigInt {
+    let value = this.get("balanceTokens");
+    return value.toBigInt();
+  }
+
+  set balanceTokens(value: BigInt) {
+    this.set("balanceTokens", Value.fromBigInt(value));
+  }
 }
 
 export class AccountVaultPositionUpdate extends Entity {
@@ -1077,94 +1095,76 @@ export class AccountVaultPositionUpdate extends Entity {
     this.set("account", Value.fromString(value));
   }
 
-  get balanceShares(): BigInt {
-    let value = this.get("balanceShares");
+  get deposits(): BigInt {
+    let value = this.get("deposits");
     return value.toBigInt();
   }
 
-  set balanceShares(value: BigInt) {
-    this.set("balanceShares", Value.fromBigInt(value));
+  set deposits(value: BigInt) {
+    this.set("deposits", Value.fromBigInt(value));
   }
 
-  get balanceTokens(): BigInt {
-    let value = this.get("balanceTokens");
+  get withdrawals(): BigInt {
+    let value = this.get("withdrawals");
     return value.toBigInt();
   }
 
-  set balanceTokens(value: BigInt) {
-    this.set("balanceTokens", Value.fromBigInt(value));
+  set withdrawals(value: BigInt) {
+    this.set("withdrawals", Value.fromBigInt(value));
   }
 
-  get totalDeposits(): BigInt {
-    let value = this.get("totalDeposits");
+  get sharesMinted(): BigInt {
+    let value = this.get("sharesMinted");
     return value.toBigInt();
   }
 
-  set totalDeposits(value: BigInt) {
-    this.set("totalDeposits", Value.fromBigInt(value));
+  set sharesMinted(value: BigInt) {
+    this.set("sharesMinted", Value.fromBigInt(value));
   }
 
-  get totalWithdrawals(): BigInt {
-    let value = this.get("totalWithdrawals");
+  get sharesBurnt(): BigInt {
+    let value = this.get("sharesBurnt");
     return value.toBigInt();
   }
 
-  set totalWithdrawals(value: BigInt) {
-    this.set("totalWithdrawals", Value.fromBigInt(value));
+  set sharesBurnt(value: BigInt) {
+    this.set("sharesBurnt", Value.fromBigInt(value));
   }
 
-  get totalSharesMinted(): BigInt {
-    let value = this.get("totalSharesMinted");
+  get tokensSent(): BigInt {
+    let value = this.get("tokensSent");
     return value.toBigInt();
   }
 
-  set totalSharesMinted(value: BigInt) {
-    this.set("totalSharesMinted", Value.fromBigInt(value));
+  set tokensSent(value: BigInt) {
+    this.set("tokensSent", Value.fromBigInt(value));
   }
 
-  get totalSharesBurnt(): BigInt {
-    let value = this.get("totalSharesBurnt");
+  get tokensReceived(): BigInt {
+    let value = this.get("tokensReceived");
     return value.toBigInt();
   }
 
-  set totalSharesBurnt(value: BigInt) {
-    this.set("totalSharesBurnt", Value.fromBigInt(value));
+  set tokensReceived(value: BigInt) {
+    this.set("tokensReceived", Value.fromBigInt(value));
   }
 
-  get totalTokensSent(): BigInt {
-    let value = this.get("totalTokensSent");
+  get sharesSent(): BigInt {
+    let value = this.get("sharesSent");
     return value.toBigInt();
   }
 
-  set totalTokensSent(value: BigInt) {
-    this.set("totalTokensSent", Value.fromBigInt(value));
+  set sharesSent(value: BigInt) {
+    this.set("sharesSent", Value.fromBigInt(value));
   }
 
-  get totalTokensReceived(): BigInt {
-    let value = this.get("totalTokensReceived");
+  get sharesReceived(): BigInt {
+    let value = this.get("sharesReceived");
     return value.toBigInt();
   }
 
-  set totalTokensReceived(value: BigInt) {
-    this.set("totalTokensReceived", Value.fromBigInt(value));
-  }
-
-  get totalSharesSent(): BigInt {
-    let value = this.get("totalSharesSent");
-    return value.toBigInt();
-  }
-
-  set totalSharesSent(value: BigInt) {
-    this.set("totalSharesSent", Value.fromBigInt(value));
-  }
-
-  get totalSharesReceived(): BigInt {
-    let value = this.get("totalSharesReceived");
-    return value.toBigInt();
-  }
-
-  set totalSharesReceived(value: BigInt) {
-    this.set("totalSharesReceived", Value.fromBigInt(value));
+  set sharesReceived(value: BigInt) {
+    this.set("sharesReceived", Value.fromBigInt(value));
   }
 
   get transaction(): string {
@@ -1174,6 +1174,15 @@ export class AccountVaultPositionUpdate extends Entity {
 
   set transaction(value: string) {
     this.set("transaction", Value.fromString(value));
+  }
+
+  get vaultUpdate(): string {
+    let value = this.get("vaultUpdate");
+    return value.toString();
+  }
+
+  set vaultUpdate(value: string) {
+    this.set("vaultUpdate", Value.fromString(value));
   }
 }
 
