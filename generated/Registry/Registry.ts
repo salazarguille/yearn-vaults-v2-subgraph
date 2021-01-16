@@ -23,7 +23,7 @@ export class NewRelease__Params {
     this._event = event;
   }
 
-  get event_id(): BigInt {
+  get release_id(): BigInt {
     return this._event.parameters[0].value.toBigInt();
   }
 
@@ -53,7 +53,7 @@ export class NewVault__Params {
     return this._event.parameters[0].value.toAddress();
   }
 
-  get event_id(): BigInt {
+  get deployment_id(): BigInt {
     return this._event.parameters[1].value.toBigInt();
   }
 
@@ -83,12 +83,56 @@ export class NewExperimentalVault__Params {
     return this._event.parameters[0].value.toAddress();
   }
 
-  get vault(): Address {
+  get deployer(): Address {
     return this._event.parameters[1].value.toAddress();
   }
 
+  get vault(): Address {
+    return this._event.parameters[2].value.toAddress();
+  }
+
   get api_version(): string {
-    return this._event.parameters[2].value.toString();
+    return this._event.parameters[3].value.toString();
+  }
+}
+
+export class NewGovernance extends ethereum.Event {
+  get params(): NewGovernance__Params {
+    return new NewGovernance__Params(this);
+  }
+}
+
+export class NewGovernance__Params {
+  _event: NewGovernance;
+
+  constructor(event: NewGovernance) {
+    this._event = event;
+  }
+
+  get governance(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+}
+
+export class VaultTagged extends ethereum.Event {
+  get params(): VaultTagged__Params {
+    return new VaultTagged__Params(this);
+  }
+}
+
+export class VaultTagged__Params {
+  _event: VaultTagged;
+
+  constructor(event: VaultTagged) {
+    this._event = event;
+  }
+
+  get vault(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get tag(): string {
+    return this._event.parameters[1].value.toString();
   }
 }
 
@@ -97,57 +141,80 @@ export class Registry extends ethereum.SmartContract {
     return new Registry("Registry", address);
   }
 
-  newVault(token: Address, guardian: Address): Address {
-    let result = super.call("newVault", "newVault(address,address):(address)", [
-      ethereum.Value.fromAddress(token),
-      ethereum.Value.fromAddress(guardian)
+  latestRelease(): string {
+    let result = super.call("latestRelease", "latestRelease():(string)", []);
+
+    return result[0].toString();
+  }
+
+  try_latestRelease(): ethereum.CallResult<string> {
+    let result = super.tryCall("latestRelease", "latestRelease():(string)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toString());
+  }
+
+  latestVault(token: Address): Address {
+    let result = super.call("latestVault", "latestVault(address):(address)", [
+      ethereum.Value.fromAddress(token)
     ]);
+
+    return result[0].toAddress();
+  }
+
+  try_latestVault(token: Address): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "latestVault",
+      "latestVault(address):(address)",
+      [ethereum.Value.fromAddress(token)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  newVault(
+    token: Address,
+    guardian: Address,
+    rewards: Address,
+    name: string,
+    symbol: string
+  ): Address {
+    let result = super.call(
+      "newVault",
+      "newVault(address,address,address,string,string):(address)",
+      [
+        ethereum.Value.fromAddress(token),
+        ethereum.Value.fromAddress(guardian),
+        ethereum.Value.fromAddress(rewards),
+        ethereum.Value.fromString(name),
+        ethereum.Value.fromString(symbol)
+      ]
+    );
 
     return result[0].toAddress();
   }
 
   try_newVault(
     token: Address,
-    guardian: Address
-  ): ethereum.CallResult<Address> {
-    let result = super.tryCall(
-      "newVault",
-      "newVault(address,address):(address)",
-      [ethereum.Value.fromAddress(token), ethereum.Value.fromAddress(guardian)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  newVault1(token: Address, guardian: Address, nameOverride: string): Address {
-    let result = super.call(
-      "newVault",
-      "newVault(address,address,string):(address)",
-      [
-        ethereum.Value.fromAddress(token),
-        ethereum.Value.fromAddress(guardian),
-        ethereum.Value.fromString(nameOverride)
-      ]
-    );
-
-    return result[0].toAddress();
-  }
-
-  try_newVault1(
-    token: Address,
     guardian: Address,
-    nameOverride: string
+    rewards: Address,
+    name: string,
+    symbol: string
   ): ethereum.CallResult<Address> {
     let result = super.tryCall(
       "newVault",
-      "newVault(address,address,string):(address)",
+      "newVault(address,address,address,string,string):(address)",
       [
         ethereum.Value.fromAddress(token),
         ethereum.Value.fromAddress(guardian),
-        ethereum.Value.fromString(nameOverride)
+        ethereum.Value.fromAddress(rewards),
+        ethereum.Value.fromString(name),
+        ethereum.Value.fromString(symbol)
       ]
     );
     if (result.reverted) {
@@ -157,224 +224,48 @@ export class Registry extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  newVault2(
+  newExperimentalVault(
     token: Address,
+    governance: Address,
     guardian: Address,
-    nameOverride: string,
-    symbolOverride: string
-  ): Address {
-    let result = super.call(
-      "newVault",
-      "newVault(address,address,string,string):(address)",
-      [
-        ethereum.Value.fromAddress(token),
-        ethereum.Value.fromAddress(guardian),
-        ethereum.Value.fromString(nameOverride),
-        ethereum.Value.fromString(symbolOverride)
-      ]
-    );
-
-    return result[0].toAddress();
-  }
-
-  try_newVault2(
-    token: Address,
-    guardian: Address,
-    nameOverride: string,
-    symbolOverride: string
-  ): ethereum.CallResult<Address> {
-    let result = super.tryCall(
-      "newVault",
-      "newVault(address,address,string,string):(address)",
-      [
-        ethereum.Value.fromAddress(token),
-        ethereum.Value.fromAddress(guardian),
-        ethereum.Value.fromString(nameOverride),
-        ethereum.Value.fromString(symbolOverride)
-      ]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  newExperimentalVault(token: Address): Address {
-    let result = super.call(
-      "newExperimentalVault",
-      "newExperimentalVault(address):(address)",
-      [ethereum.Value.fromAddress(token)]
-    );
-
-    return result[0].toAddress();
-  }
-
-  try_newExperimentalVault(token: Address): ethereum.CallResult<Address> {
-    let result = super.tryCall(
-      "newExperimentalVault",
-      "newExperimentalVault(address):(address)",
-      [ethereum.Value.fromAddress(token)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  newExperimentalVault1(token: Address, aGovernance: Address): Address {
-    let result = super.call(
-      "newExperimentalVault",
-      "newExperimentalVault(address,address):(address)",
-      [
-        ethereum.Value.fromAddress(token),
-        ethereum.Value.fromAddress(aGovernance)
-      ]
-    );
-
-    return result[0].toAddress();
-  }
-
-  try_newExperimentalVault1(
-    token: Address,
-    aGovernance: Address
-  ): ethereum.CallResult<Address> {
-    let result = super.tryCall(
-      "newExperimentalVault",
-      "newExperimentalVault(address,address):(address)",
-      [
-        ethereum.Value.fromAddress(token),
-        ethereum.Value.fromAddress(aGovernance)
-      ]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  newExperimentalVault2(
-    token: Address,
-    aGovernance: Address,
-    guardian: Address
+    rewards: Address,
+    name: string,
+    symbol: string
   ): Address {
     let result = super.call(
       "newExperimentalVault",
-      "newExperimentalVault(address,address,address):(address)",
+      "newExperimentalVault(address,address,address,address,string,string):(address)",
       [
         ethereum.Value.fromAddress(token),
-        ethereum.Value.fromAddress(aGovernance),
-        ethereum.Value.fromAddress(guardian)
+        ethereum.Value.fromAddress(governance),
+        ethereum.Value.fromAddress(guardian),
+        ethereum.Value.fromAddress(rewards),
+        ethereum.Value.fromString(name),
+        ethereum.Value.fromString(symbol)
       ]
     );
 
     return result[0].toAddress();
   }
 
-  try_newExperimentalVault2(
+  try_newExperimentalVault(
     token: Address,
-    aGovernance: Address,
-    guardian: Address
+    governance: Address,
+    guardian: Address,
+    rewards: Address,
+    name: string,
+    symbol: string
   ): ethereum.CallResult<Address> {
     let result = super.tryCall(
       "newExperimentalVault",
-      "newExperimentalVault(address,address,address):(address)",
+      "newExperimentalVault(address,address,address,address,string,string):(address)",
       [
         ethereum.Value.fromAddress(token),
-        ethereum.Value.fromAddress(aGovernance),
-        ethereum.Value.fromAddress(guardian)
-      ]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  newExperimentalVault3(
-    token: Address,
-    aGovernance: Address,
-    guardian: Address,
-    nameOverride: string
-  ): Address {
-    let result = super.call(
-      "newExperimentalVault",
-      "newExperimentalVault(address,address,address,string):(address)",
-      [
-        ethereum.Value.fromAddress(token),
-        ethereum.Value.fromAddress(aGovernance),
+        ethereum.Value.fromAddress(governance),
         ethereum.Value.fromAddress(guardian),
-        ethereum.Value.fromString(nameOverride)
-      ]
-    );
-
-    return result[0].toAddress();
-  }
-
-  try_newExperimentalVault3(
-    token: Address,
-    aGovernance: Address,
-    guardian: Address,
-    nameOverride: string
-  ): ethereum.CallResult<Address> {
-    let result = super.tryCall(
-      "newExperimentalVault",
-      "newExperimentalVault(address,address,address,string):(address)",
-      [
-        ethereum.Value.fromAddress(token),
-        ethereum.Value.fromAddress(aGovernance),
-        ethereum.Value.fromAddress(guardian),
-        ethereum.Value.fromString(nameOverride)
-      ]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  newExperimentalVault4(
-    token: Address,
-    aGovernance: Address,
-    guardian: Address,
-    nameOverride: string,
-    symbolOverride: string
-  ): Address {
-    let result = super.call(
-      "newExperimentalVault",
-      "newExperimentalVault(address,address,address,string,string):(address)",
-      [
-        ethereum.Value.fromAddress(token),
-        ethereum.Value.fromAddress(aGovernance),
-        ethereum.Value.fromAddress(guardian),
-        ethereum.Value.fromString(nameOverride),
-        ethereum.Value.fromString(symbolOverride)
-      ]
-    );
-
-    return result[0].toAddress();
-  }
-
-  try_newExperimentalVault4(
-    token: Address,
-    aGovernance: Address,
-    guardian: Address,
-    nameOverride: string,
-    symbolOverride: string
-  ): ethereum.CallResult<Address> {
-    let result = super.tryCall(
-      "newExperimentalVault",
-      "newExperimentalVault(address,address,address,string,string):(address)",
-      [
-        ethereum.Value.fromAddress(token),
-        ethereum.Value.fromAddress(aGovernance),
-        ethereum.Value.fromAddress(guardian),
-        ethereum.Value.fromString(nameOverride),
-        ethereum.Value.fromString(symbolOverride)
+        ethereum.Value.fromAddress(rewards),
+        ethereum.Value.fromString(name),
+        ethereum.Value.fromString(symbol)
       ]
     );
     if (result.reverted) {
@@ -476,6 +367,44 @@ export class Registry extends ethereum.SmartContract {
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
+
+  tags(arg0: Address): string {
+    let result = super.call("tags", "tags(address):(string)", [
+      ethereum.Value.fromAddress(arg0)
+    ]);
+
+    return result[0].toString();
+  }
+
+  try_tags(arg0: Address): ethereum.CallResult<string> {
+    let result = super.tryCall("tags", "tags(address):(string)", [
+      ethereum.Value.fromAddress(arg0)
+    ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toString());
+  }
+
+  banksy(arg0: Address): boolean {
+    let result = super.call("banksy", "banksy(address):(bool)", [
+      ethereum.Value.fromAddress(arg0)
+    ]);
+
+    return result[0].toBoolean();
+  }
+
+  try_banksy(arg0: Address): ethereum.CallResult<boolean> {
+    let result = super.tryCall("banksy", "banksy(address):(bool)", [
+      ethereum.Value.fromAddress(arg0)
+    ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
 }
 
 export class ConstructorCall extends ethereum.Call {
@@ -521,7 +450,7 @@ export class SetGovernanceCall__Inputs {
     this._call = call;
   }
 
-  get _governance(): Address {
+  get governance(): Address {
     return this._call.inputValues[0].value.toAddress();
   }
 }
@@ -614,100 +543,24 @@ export class NewVaultCall__Inputs {
   get guardian(): Address {
     return this._call.inputValues[1].value.toAddress();
   }
+
+  get rewards(): Address {
+    return this._call.inputValues[2].value.toAddress();
+  }
+
+  get name(): string {
+    return this._call.inputValues[3].value.toString();
+  }
+
+  get symbol(): string {
+    return this._call.inputValues[4].value.toString();
+  }
 }
 
 export class NewVaultCall__Outputs {
   _call: NewVaultCall;
 
   constructor(call: NewVaultCall) {
-    this._call = call;
-  }
-
-  get value0(): Address {
-    return this._call.outputValues[0].value.toAddress();
-  }
-}
-
-export class NewVault1Call extends ethereum.Call {
-  get inputs(): NewVault1Call__Inputs {
-    return new NewVault1Call__Inputs(this);
-  }
-
-  get outputs(): NewVault1Call__Outputs {
-    return new NewVault1Call__Outputs(this);
-  }
-}
-
-export class NewVault1Call__Inputs {
-  _call: NewVault1Call;
-
-  constructor(call: NewVault1Call) {
-    this._call = call;
-  }
-
-  get token(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-
-  get guardian(): Address {
-    return this._call.inputValues[1].value.toAddress();
-  }
-
-  get nameOverride(): string {
-    return this._call.inputValues[2].value.toString();
-  }
-}
-
-export class NewVault1Call__Outputs {
-  _call: NewVault1Call;
-
-  constructor(call: NewVault1Call) {
-    this._call = call;
-  }
-
-  get value0(): Address {
-    return this._call.outputValues[0].value.toAddress();
-  }
-}
-
-export class NewVault2Call extends ethereum.Call {
-  get inputs(): NewVault2Call__Inputs {
-    return new NewVault2Call__Inputs(this);
-  }
-
-  get outputs(): NewVault2Call__Outputs {
-    return new NewVault2Call__Outputs(this);
-  }
-}
-
-export class NewVault2Call__Inputs {
-  _call: NewVault2Call;
-
-  constructor(call: NewVault2Call) {
-    this._call = call;
-  }
-
-  get token(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-
-  get guardian(): Address {
-    return this._call.inputValues[1].value.toAddress();
-  }
-
-  get nameOverride(): string {
-    return this._call.inputValues[2].value.toString();
-  }
-
-  get symbolOverride(): string {
-    return this._call.inputValues[3].value.toString();
-  }
-}
-
-export class NewVault2Call__Outputs {
-  _call: NewVault2Call;
-
-  constructor(call: NewVault2Call) {
     this._call = call;
   }
 
@@ -736,188 +589,32 @@ export class NewExperimentalVaultCall__Inputs {
   get token(): Address {
     return this._call.inputValues[0].value.toAddress();
   }
+
+  get governance(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+
+  get guardian(): Address {
+    return this._call.inputValues[2].value.toAddress();
+  }
+
+  get rewards(): Address {
+    return this._call.inputValues[3].value.toAddress();
+  }
+
+  get name(): string {
+    return this._call.inputValues[4].value.toString();
+  }
+
+  get symbol(): string {
+    return this._call.inputValues[5].value.toString();
+  }
 }
 
 export class NewExperimentalVaultCall__Outputs {
   _call: NewExperimentalVaultCall;
 
   constructor(call: NewExperimentalVaultCall) {
-    this._call = call;
-  }
-
-  get value0(): Address {
-    return this._call.outputValues[0].value.toAddress();
-  }
-}
-
-export class NewExperimentalVault1Call extends ethereum.Call {
-  get inputs(): NewExperimentalVault1Call__Inputs {
-    return new NewExperimentalVault1Call__Inputs(this);
-  }
-
-  get outputs(): NewExperimentalVault1Call__Outputs {
-    return new NewExperimentalVault1Call__Outputs(this);
-  }
-}
-
-export class NewExperimentalVault1Call__Inputs {
-  _call: NewExperimentalVault1Call;
-
-  constructor(call: NewExperimentalVault1Call) {
-    this._call = call;
-  }
-
-  get token(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-
-  get aGovernance(): Address {
-    return this._call.inputValues[1].value.toAddress();
-  }
-}
-
-export class NewExperimentalVault1Call__Outputs {
-  _call: NewExperimentalVault1Call;
-
-  constructor(call: NewExperimentalVault1Call) {
-    this._call = call;
-  }
-
-  get value0(): Address {
-    return this._call.outputValues[0].value.toAddress();
-  }
-}
-
-export class NewExperimentalVault2Call extends ethereum.Call {
-  get inputs(): NewExperimentalVault2Call__Inputs {
-    return new NewExperimentalVault2Call__Inputs(this);
-  }
-
-  get outputs(): NewExperimentalVault2Call__Outputs {
-    return new NewExperimentalVault2Call__Outputs(this);
-  }
-}
-
-export class NewExperimentalVault2Call__Inputs {
-  _call: NewExperimentalVault2Call;
-
-  constructor(call: NewExperimentalVault2Call) {
-    this._call = call;
-  }
-
-  get token(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-
-  get aGovernance(): Address {
-    return this._call.inputValues[1].value.toAddress();
-  }
-
-  get guardian(): Address {
-    return this._call.inputValues[2].value.toAddress();
-  }
-}
-
-export class NewExperimentalVault2Call__Outputs {
-  _call: NewExperimentalVault2Call;
-
-  constructor(call: NewExperimentalVault2Call) {
-    this._call = call;
-  }
-
-  get value0(): Address {
-    return this._call.outputValues[0].value.toAddress();
-  }
-}
-
-export class NewExperimentalVault3Call extends ethereum.Call {
-  get inputs(): NewExperimentalVault3Call__Inputs {
-    return new NewExperimentalVault3Call__Inputs(this);
-  }
-
-  get outputs(): NewExperimentalVault3Call__Outputs {
-    return new NewExperimentalVault3Call__Outputs(this);
-  }
-}
-
-export class NewExperimentalVault3Call__Inputs {
-  _call: NewExperimentalVault3Call;
-
-  constructor(call: NewExperimentalVault3Call) {
-    this._call = call;
-  }
-
-  get token(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-
-  get aGovernance(): Address {
-    return this._call.inputValues[1].value.toAddress();
-  }
-
-  get guardian(): Address {
-    return this._call.inputValues[2].value.toAddress();
-  }
-
-  get nameOverride(): string {
-    return this._call.inputValues[3].value.toString();
-  }
-}
-
-export class NewExperimentalVault3Call__Outputs {
-  _call: NewExperimentalVault3Call;
-
-  constructor(call: NewExperimentalVault3Call) {
-    this._call = call;
-  }
-
-  get value0(): Address {
-    return this._call.outputValues[0].value.toAddress();
-  }
-}
-
-export class NewExperimentalVault4Call extends ethereum.Call {
-  get inputs(): NewExperimentalVault4Call__Inputs {
-    return new NewExperimentalVault4Call__Inputs(this);
-  }
-
-  get outputs(): NewExperimentalVault4Call__Outputs {
-    return new NewExperimentalVault4Call__Outputs(this);
-  }
-}
-
-export class NewExperimentalVault4Call__Inputs {
-  _call: NewExperimentalVault4Call;
-
-  constructor(call: NewExperimentalVault4Call) {
-    this._call = call;
-  }
-
-  get token(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-
-  get aGovernance(): Address {
-    return this._call.inputValues[1].value.toAddress();
-  }
-
-  get guardian(): Address {
-    return this._call.inputValues[2].value.toAddress();
-  }
-
-  get nameOverride(): string {
-    return this._call.inputValues[3].value.toString();
-  }
-
-  get symbolOverride(): string {
-    return this._call.inputValues[4].value.toString();
-  }
-}
-
-export class NewExperimentalVault4Call__Outputs {
-  _call: NewExperimentalVault4Call;
-
-  constructor(call: NewExperimentalVault4Call) {
     this._call = call;
   }
 
@@ -952,6 +649,104 @@ export class EndorseVaultCall__Outputs {
   _call: EndorseVaultCall;
 
   constructor(call: EndorseVaultCall) {
+    this._call = call;
+  }
+}
+
+export class SetBanksyCall extends ethereum.Call {
+  get inputs(): SetBanksyCall__Inputs {
+    return new SetBanksyCall__Inputs(this);
+  }
+
+  get outputs(): SetBanksyCall__Outputs {
+    return new SetBanksyCall__Outputs(this);
+  }
+}
+
+export class SetBanksyCall__Inputs {
+  _call: SetBanksyCall;
+
+  constructor(call: SetBanksyCall) {
+    this._call = call;
+  }
+
+  get tagger(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+}
+
+export class SetBanksyCall__Outputs {
+  _call: SetBanksyCall;
+
+  constructor(call: SetBanksyCall) {
+    this._call = call;
+  }
+}
+
+export class SetBanksy1Call extends ethereum.Call {
+  get inputs(): SetBanksy1Call__Inputs {
+    return new SetBanksy1Call__Inputs(this);
+  }
+
+  get outputs(): SetBanksy1Call__Outputs {
+    return new SetBanksy1Call__Outputs(this);
+  }
+}
+
+export class SetBanksy1Call__Inputs {
+  _call: SetBanksy1Call;
+
+  constructor(call: SetBanksy1Call) {
+    this._call = call;
+  }
+
+  get tagger(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get allowed(): boolean {
+    return this._call.inputValues[1].value.toBoolean();
+  }
+}
+
+export class SetBanksy1Call__Outputs {
+  _call: SetBanksy1Call;
+
+  constructor(call: SetBanksy1Call) {
+    this._call = call;
+  }
+}
+
+export class TagVaultCall extends ethereum.Call {
+  get inputs(): TagVaultCall__Inputs {
+    return new TagVaultCall__Inputs(this);
+  }
+
+  get outputs(): TagVaultCall__Outputs {
+    return new TagVaultCall__Outputs(this);
+  }
+}
+
+export class TagVaultCall__Inputs {
+  _call: TagVaultCall;
+
+  constructor(call: TagVaultCall) {
+    this._call = call;
+  }
+
+  get vault(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get tag(): string {
+    return this._call.inputValues[1].value.toString();
+  }
+}
+
+export class TagVaultCall__Outputs {
+  _call: TagVaultCall;
+
+  constructor(call: TagVaultCall) {
     this._call = call;
   }
 }

@@ -400,6 +400,24 @@ export class Vault extends Entity {
   set performanceFeeBps(value: i32) {
     this.set("performanceFeeBps", Value.fromI32(value));
   }
+
+  get activation(): BigInt {
+    let value = this.get("activation");
+    return value.toBigInt();
+  }
+
+  set activation(value: BigInt) {
+    this.set("activation", Value.fromBigInt(value));
+  }
+
+  get apiVersion(): string {
+    let value = this.get("apiVersion");
+    return value.toString();
+  }
+
+  set apiVersion(value: string) {
+    this.set("apiVersion", Value.fromString(value));
+  }
 }
 
 export class VaultUpdate extends Entity {

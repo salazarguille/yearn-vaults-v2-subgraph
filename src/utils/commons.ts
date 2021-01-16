@@ -1,7 +1,7 @@
 import { log, BigInt, ethereum, Bytes, Address } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/Registry/ERC20";
 import {
-  EthTransaction, Token,
+  Transaction, Token,
 } from "../../generated/schema";
 
 export function getTimestampInMillis(event: ethereum.Event): BigInt {
@@ -42,7 +42,8 @@ export function createToken(
   let id = address.toHexString()
   log.info("Creating token entity fo {} / {} / {} / {}", [id, name, symbol, decimals.toString()]);
   let entity = new Token(id);
-  entity.address = address
+  // TODO: check if we need this extra field since id is already mapped
+  // entity.address = address
   entity.decimals = decimals.toI32()
   entity.name = name
   entity.symbol = symbol
@@ -67,10 +68,10 @@ export function getOrCreateToken(address:Address): Token {
 export function createEthTransaction(
   event: ethereum.Event,
   action: string
-): EthTransaction {
+): Transaction {
   let id = buildIdFromEvent(event);
   log.info("Creating EthTransaction with id {}", [id]);
-  let entity = new EthTransaction(id);
+  let entity = new Transaction(id);
   entity.event = action;
   entity.from = event.transaction.from;
   entity.gasPrice = event.transaction.gasPrice;
