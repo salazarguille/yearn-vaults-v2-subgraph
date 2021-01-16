@@ -27,8 +27,25 @@ const createNewVaultFromAddress = (vaultAddress: Address): Vault => {
     vaultEntity.activation = vaultContract.activation();
     vaultEntity.apiVersion = vaultContract.apiVersion();
 
-    // NOTE: empty at start
-    vaultEntity.strategies = [];
+    // NOTE: derived
+    // vaultEntity.strategies = [];
+
+    // empty at creation
+    vaultEntity.tags = [];
+    vaultEntity.balanceTokens = BIGINT_ZERO;
+    vaultEntity.balanceTokensIdle = BIGINT_ZERO;
+    vaultEntity.balanceTokensInvested = BIGINT_ZERO;
+
+    vaultEntity.tokensDepositLimit = BIGINT_ZERO;
+    vaultEntity.sharesSupply = BIGINT_ZERO;
+    vaultEntity.managementFeeBps = 0;
+    vaultEntity.performanceFeeBps = 0;
+
+    // vaultEntity.tokensDepositLimit = vaultContract.depositLimit();
+    // vaultEntity.sharesSupply = vaultContract.totalSupply();
+    // vaultEntity.managementFeeBps = vaultContract.managementFee().toI32();
+    // vaultEntity.performanceFeeBps = vaultContract.performanceFee().toI32();
+
 
     return vaultEntity;
 }

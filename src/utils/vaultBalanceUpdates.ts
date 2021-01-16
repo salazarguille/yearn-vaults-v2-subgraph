@@ -369,15 +369,21 @@ export function mapDeposit(call: DepositCall): void {
   ): void {
   let id = buildId(transactionHash, transactionIndex);
 
-  let token = getOrCreateToken(address);
+
+  let vaultSharesToken = getOrCreateToken(address);
+  let vault = getOrCreateVault(address, false);
   let sender = getOrCreateAccount(from);
   let receiver = getOrCreateAccount(to);
+  
 
   let transfer = new Transfer(id.toString());
+
   transfer.from = sender.id;
   transfer.to = receiver.id;
 
-  transfer.token = token.id;
+  transfer.vault = vault.id;
+  transfer.token = vault.token;
+  transfer.shareToken = vaultSharesToken.id;
   // TODO: refactor this
   // transfer.shares = value;
   transfer.amount = totalAssets

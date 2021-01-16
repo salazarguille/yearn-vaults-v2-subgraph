@@ -91,8 +91,8 @@ type Vault @entity {
   classification: VaultClassification!
   # "Release Information"
   # release: VaultRelease!
-  "Latest Vault Update"
-  latestUpdate: VaultUpdate!
+  # "Latest Vault Update"
+  # latestUpdate: VaultUpdate
   "All Vault Updates"
   historicalUpdates: [VaultUpdate!]! @derivedFrom(field: "vault")
   "Strategies for this Vault"
@@ -333,7 +333,7 @@ type Strategy @entity {
   "The reports created by this strategy."
   reports: [StrategyReport!]!
   "The latest report for this Strategy"
-  latestReport: StrategyReport!
+  latestReport: StrategyReport
 
   "harvest() calls"
   harvests: [Harvest!]! @derivedFrom(field: "strategy")

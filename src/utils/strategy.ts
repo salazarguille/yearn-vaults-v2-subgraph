@@ -84,7 +84,8 @@ export function createStrategy(
   entity.address = strategy
   entity.vault = vault.toHexString()
   entity.reports = []
-  entity.harvests = []
+  // NOTE: derived
+  // entity.harvests = []
   entity.debtLimit = debtLimit
   entity.rateLimit = rateLimit
   entity.performanceFeeBps = performanceFee.toI32();

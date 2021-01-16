@@ -15,6 +15,8 @@ import {
 } from "../utils/vaultBalanceUpdates";
 import { buildIdFromEvent, createEthTransaction, getTimestampInMillis } from "../utils/commons";
 import { getOrCreateVault } from "../utils/vault";
+import { createStrategy } from "../utils/strategy";
+
 
 export function createStrategyReport(
   transactionId: string,
@@ -79,31 +81,6 @@ export function reportStrategy(
   }
 }
 
-export function createStrategy(
-  transactionId: string,
-  strategy: Address,
-  vault: Address,
-  debtLimit: BigInt,
-  rateLimit: BigInt,
-  performanceFee: BigInt,
-  event: ethereum.Event
-): Strategy {
-  let id = strategy.toHexString()
-  let entity = new Strategy(id)
-  entity.transaction = transactionId
-  entity.address = strategy
-  entity.vault = vault.toHexString()
-  entity.reports = []
-  entity.harvests = []
-  entity.debtLimit = debtLimit
-  entity.rateLimit = rateLimit
-  entity.performanceFeeBps = performanceFee.toI32()
-  entity.blockNumber = event.block.number
-  entity.timestamp = getTimestampInMillis(event)
-  entity.save()
-  return entity
-}
-
 export function addStrategyToVault(
   transactionId: string,
   vaultAddress: Address,
@@ -124,16 +101,18 @@ export function addStrategyToVault(
       performanceFee,
       event
     )
-    let strategies = entity.strategies
-    strategies.push(newStrategy.id)
-    entity.strategies = strategies
-    entity.save()
+    // NOTE: commented since field is derived
+    // let strategies = entity.strategies
+    // strategies.push(newStrategy.id)
+    // entity.strategies = strategies
+    // entity.save()
   }
 }
 
 export function handleStrategyAdded(event: StrategyAddedEvent): void {
   let ethTransaction = createEthTransaction(event, "StrategyAddedEvent")
 
+  // TODO: refactor to createStrategy since derived links vault + strat
   addStrategyToVault(
     ethTransaction.id,
     event.address,
