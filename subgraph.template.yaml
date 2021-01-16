@@ -16,7 +16,7 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - Vault
-        - EthTransaction
+        - Transaction
       abis:
         - name: Registry
           file: ./abis/Registry.json
@@ -29,7 +29,7 @@ dataSources:
           handler: handleNewRelease
         - event: NewVault(indexed address,indexed uint256,address,string)
           handler: handleNewVault
-        - event: NewExperimentalVault(indexed address,address,string)
+        - event: NewExperimentalVault(indexed address,indexed address,address,string)
           handler: handleNewExperimentalVault
       file: ./src/mappings/registryMappings.ts
   # UNCOMMENT FOR EXPERIMENTAL VAULTS
@@ -48,10 +48,9 @@ dataSources:
       file: ./src/mappings/vaults/yvUSDCVaultMappings.ts
       entities:
         - Vault
-        - EthTransaction
+        - Transaction
         - Strategy
         - VaultUpdate
-        - Operation
         - Transfer
         - Account
         - AccountUpdate
@@ -90,10 +89,9 @@ dataSources:
       file: ./src/mappings/vaults/yvDAIVaultMappings.ts
       entities:
         - Vault
-        - EthTransaction
+        - Transaction
         - Strategy
         - VaultUpdate
-        - Operation
         - Transfer
         - Account
         - AccountUpdate
@@ -132,7 +130,6 @@ templates:
         - Vault
         - Strategy
         - VaultUpdate
-        - Operation
         - Transfer
         - Account
         - AccountUpdate

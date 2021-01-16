@@ -97,7 +97,7 @@ export function createStrategy(
   entity.harvests = []
   entity.debtLimit = debtLimit
   entity.rateLimit = rateLimit
-  entity.performanceFee = performanceFee
+  entity.performanceFeeBps = performanceFee.toI32()
   entity.blockNumber = event.block.number
   entity.timestamp = getTimestampInMillis(event)
   entity.save()

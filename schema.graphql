@@ -106,6 +106,13 @@ type Vault @entity {
   transaction: Transaction!
   "Tags attached to the Vault"
   tags: [String!]!
+
+  # TODO: refactor these fields out into vault release entity
+  # release fields temporary for MVP
+  "Creation timestamp"
+  activation: BigInt!
+  "The API version."
+  apiVersion: String!
 }
 
 type VaultUpdate @entity {
@@ -140,12 +147,12 @@ type VaultUpdate @entity {
   totalSharesMinted: BigInt!
   "Sum of Shares burnt over all time"
   totalSharesBurnt: BigInt!
-  
+
   ### PERFORMANCE
 
   "Current price per full share"
   pricePerShare: BigInt!
-  
+
   # TODO nomenclature returns vs performance
   "Total returns before fees in Tokens"
   totalReturnsBeforeFees: BigInt!
@@ -273,7 +280,7 @@ type AccountVaultPositionUpdate @entity {
   balanceShares: BigInt!
   "Token balance"
   balanceTokens: BigInt!
-    
+
   "Total token deposits"
   totalDeposits: BigInt!
   "Total token withdrawals"

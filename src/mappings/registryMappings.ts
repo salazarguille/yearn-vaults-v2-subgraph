@@ -11,7 +11,7 @@ export function handleNewRelease(event: NewReleaseEvent): void {
   releaseVault(
     event.params.template,
     event.params.api_version,
-    event.params.event_id,
+    event.params.release_id,
     event
   )
 }
@@ -23,14 +23,14 @@ export function handleNewVault(event: NewVaultEvent): void {
     event.params.vault,
     "Endorsed",
     event.params.api_version,
-    event.params.event_id,
+    event.params.deployment_id,
     true,
     event,
   )
 }
 
 export function handleNewExperimentalVault(event: NewExperimentalVaultEvent): void {
-  let ethTransaction = createEthTransaction(event, "NewVaultEvent");
+  let ethTransaction = createEthTransaction(event, "NewExperimentalVault");
   createVault(
     ethTransaction.id,
     event.params.vault,
