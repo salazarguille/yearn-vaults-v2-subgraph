@@ -91,8 +91,8 @@ type Vault @entity {
   classification: VaultClassification!
   # "Release Information"
   # release: VaultRelease!
-  "Latest Vault Update"
-  latestUpdate: VaultUpdate!
+  # "Latest Vault Update"
+  # latestUpdate: VaultUpdate
   "All Vault Updates"
   historicalUpdates: [VaultUpdate!]! @derivedFrom(field: "vault")
   "Strategies for this Vault"
@@ -121,6 +121,13 @@ type Vault @entity {
   managementFeeBps: Int!
   "Performance fee in basis points"
   performanceFeeBps: Int!
+
+  # TODO: refactor these fields out into vault release entity
+  # release fields temporary for MVP
+  "Creation timestamp"
+  activation: BigInt!
+  "The API version."
+  apiVersion: String!
 }
 
 type VaultUpdate @entity {
@@ -145,12 +152,12 @@ type VaultUpdate @entity {
   sharesMinted: BigInt!
   "Sum of Shares burnt over all time"
   sharesBurnt: BigInt!
-  
+
   ### PERFORMANCE
 
   "Current price per full share"
   pricePerShare: BigInt!
-  
+
   "Returns generated in Tokens"
   returnsGenerated: BigInt!
   "Total fees in Shares" # in this VaultUpdate
@@ -236,7 +243,7 @@ type Transfer @entity {
   "Block number of Transfer"
   blockNumber: BigInt!
   "Ethereum Transaction"
-  transaction: Transaction! 
+  transaction: Transaction!
 }
 
 type AccountVaultPosition @entity {
@@ -270,7 +277,7 @@ type AccountVaultPositionUpdate @entity {
   blockNumber: BigInt!
   "The Account this update applies to"
   account: Account!
-    
+
   "Token deposits"
   deposits: BigInt!
   "Token withdrawals"
@@ -326,7 +333,7 @@ type Strategy @entity {
   "The reports created by this strategy."
   reports: [StrategyReport!]!
   "The latest report for this Strategy"
-  latestReport: StrategyReport!
+  latestReport: StrategyReport
 
   "harvest() calls"
   harvests: [Harvest!]! @derivedFrom(field: "strategy")
@@ -357,8 +364,8 @@ type StrategyReport @entity {
   blockNumber: BigInt!
   "Timestamp the strategy report was most recently updated."
   timestamp: BigInt!
-  "Vault state"
-  vaultUpdate: VaultUpdate!
+  # "Vault state"
+  # vaultUpdate: VaultUpdate!
 
   #### TODO Awaiting updated Vault Yield-Oracles https://github.com/iearn-finance/yearn-vaults/pull/69
   # "12-day EMA of Vault APY as reported by built-in Yield Oracle"

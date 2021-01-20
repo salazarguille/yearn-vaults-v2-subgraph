@@ -266,15 +266,6 @@ export class Vault extends Entity {
     this.set("classification", Value.fromString(value));
   }
 
-  get latestUpdate(): string {
-    let value = this.get("latestUpdate");
-    return value.toString();
-  }
-
-  set latestUpdate(value: string) {
-    this.set("latestUpdate", Value.fromString(value));
-  }
-
   get historicalUpdates(): Array<string> {
     let value = this.get("historicalUpdates");
     return value.toStringArray();
@@ -399,6 +390,24 @@ export class Vault extends Entity {
 
   set performanceFeeBps(value: i32) {
     this.set("performanceFeeBps", Value.fromI32(value));
+  }
+
+  get activation(): BigInt {
+    let value = this.get("activation");
+    return value.toBigInt();
+  }
+
+  set activation(value: BigInt) {
+    this.set("activation", Value.fromBigInt(value));
+  }
+
+  get apiVersion(): string {
+    let value = this.get("apiVersion");
+    return value.toString();
+  }
+
+  set apiVersion(value: string) {
+    this.set("apiVersion", Value.fromString(value));
   }
 }
 
@@ -1297,13 +1306,21 @@ export class Strategy extends Entity {
     this.set("reports", Value.fromStringArray(value));
   }
 
-  get latestReport(): string {
+  get latestReport(): string | null {
     let value = this.get("latestReport");
-    return value.toString();
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set latestReport(value: string) {
-    this.set("latestReport", Value.fromString(value));
+  set latestReport(value: string | null) {
+    if (value === null) {
+      this.unset("latestReport");
+    } else {
+      this.set("latestReport", Value.fromString(value as string));
+    }
   }
 
   get harvests(): Array<string> {
@@ -1443,15 +1460,6 @@ export class StrategyReport extends Entity {
 
   set timestamp(value: BigInt) {
     this.set("timestamp", Value.fromBigInt(value));
-  }
-
-  get vaultUpdate(): string {
-    let value = this.get("vaultUpdate");
-    return value.toString();
-  }
-
-  set vaultUpdate(value: string) {
-    this.set("vaultUpdate", Value.fromString(value));
   }
 }
 
