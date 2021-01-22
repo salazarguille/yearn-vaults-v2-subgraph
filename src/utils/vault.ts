@@ -86,6 +86,11 @@ export function createVault(
       if(createTemplate) {
         VaultTemplate.create(vault);
       }
+    } else {
+      // NOTE: vault is experimental but being endorsed
+      if (vaultEntity.classification !== classification) {
+        vaultEntity.classification = classification;
+      }
     }
   
     // vaultEntity.blockNumber = event.block.number
