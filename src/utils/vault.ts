@@ -24,13 +24,28 @@ const createNewVaultFromAddress = (vaultAddress: Address): Vault => {
     vaultEntity.shareToken = shareToken.id;
 
     // vault fields
-    vaultEntity.timestamp = BIGINT_ZERO;
-    vaultEntity.blockNumber = BIGINT_ZERO;
     vaultEntity.activation = vaultContract.activation();
     vaultEntity.apiVersion = vaultContract.apiVersion();
 
-    // NOTE: empty at start
-    vaultEntity.strategies = [];
+    // NOTE: derived
+    // vaultEntity.strategies = [];
+
+    // empty at creation
+    vaultEntity.tags = [];
+    vaultEntity.balanceTokens = BIGINT_ZERO;
+    vaultEntity.balanceTokensIdle = BIGINT_ZERO;
+    vaultEntity.balanceTokensInvested = BIGINT_ZERO;
+
+    vaultEntity.tokensDepositLimit = BIGINT_ZERO;
+    vaultEntity.sharesSupply = BIGINT_ZERO;
+    vaultEntity.managementFeeBps = 0;
+    vaultEntity.performanceFeeBps = 0;
+
+    // vaultEntity.tokensDepositLimit = vaultContract.depositLimit();
+    // vaultEntity.sharesSupply = vaultContract.totalSupply();
+    // vaultEntity.managementFeeBps = vaultContract.managementFee().toI32();
+    // vaultEntity.performanceFeeBps = vaultContract.performanceFee().toI32();
+
 
     return vaultEntity;
 }
@@ -53,7 +68,7 @@ export function getOrCreateVault(vaultAddress: Address, createTemplate: boolean)
 export function createVault(
     transactionId: string,
     vault: Address,
-    status: string,
+    classification: string,
     apiVersion: string,
     deploymentId: BigInt,
     createTemplate: boolean,
@@ -65,35 +80,42 @@ export function createVault(
     if(vaultEntity == null) {
       vaultEntity = createNewVaultFromAddress(vault); 
       vaultEntity.transaction = transactionId
-      vaultEntity.status = status
-      vaultEntity.deploymentId = deploymentId
+      vaultEntity.classification = classification
+      // vaultEntity.deploymentId = deploymentId
       vaultEntity.apiVersion = apiVersion
       if(createTemplate) {
         VaultTemplate.create(vault);
       }
+    } else {
+      // NOTE: vault is experimental but being endorsed
+      if (vaultEntity.classification !== classification) {
+        vaultEntity.classification = classification;
+      }
     }
   
-    vaultEntity.blockNumber = event.block.number
-    vaultEntity.timestamp = getTimestampInMillis(event)
+    // vaultEntity.blockNumber = event.block.number
+    // vaultEntity.timestamp = getTimestampInMillis(event)
     vaultEntity.save()
     return vaultEntity as Vault
   }
   
+  // TODO: implement this
   export function releaseVault(
     vault: Address,
     apiVersion: string,
-    deploymentId: BigInt,
+    releaseId: BigInt,
     event: ethereum.Event
   ): Vault | null {
     let id = vault.toHexString()
     let entity = Vault.load(id)
     if(entity !== null) {
-      entity.status = 'Released'
-      entity.apiVersion = apiVersion
-      entity.deploymentId = deploymentId
-      entity.blockNumber = event.block.number
-      entity.timestamp = getTimestampInMillis(event)
-      entity.save()
+      // TODO: implement this
+      // entity.status = 'Released'
+      // entity.apiVersion = apiVersion
+      // entity.deploymentId = deploymentId
+      // entity.blockNumber = event.block.number
+      // entity.timestamp = getTimestampInMillis(event)
+      // entity.save()
     }
     return entity
   }

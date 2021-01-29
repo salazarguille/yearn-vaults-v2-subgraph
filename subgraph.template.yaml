@@ -16,7 +16,7 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - Vault
-        - EthTransaction
+        - Transaction
       abis:
         - name: Registry
           file: ./abis/Registry.json
@@ -29,93 +29,10 @@ dataSources:
           handler: handleNewRelease
         - event: NewVault(indexed address,indexed uint256,address,string)
           handler: handleNewVault
-        - event: NewExperimentalVault(indexed address,address,string)
+        - event: NewExperimentalVault(indexed address,indexed address,address,string)
           handler: handleNewExperimentalVault
       file: ./src/mappings/registryMappings.ts
-  # UNCOMMENT FOR EXPERIMENTAL VAULTS
-  # 2 Vault USDC
-  - kind: ethereum/contract
-    name: yvUSDC
-    network: {{network}}
-    source:
-      startBlock: 11390000
-      address: '0xe2F6b9773BF3A015E2aA70741Bde1498bdB9425b'
-      abi: Vault
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.3
-      language: wasm/assemblyscript
-      file: ./src/mappings/vaults/yvUSDCVaultMappings.ts
-      entities:
-        - Vault
-        - EthTransaction
-        - Strategy
-        - VaultUpdate
-        - Operation
-        - Transfer
-        - Account
-        - AccountUpdate
-        - AccountVaultBalance
-        - Token
-      abis:
-        - name: ERC20
-          file: ./abis/ERC20Detailed.json
-        - name: Vault
-          file: ./abis/Vault.json
-      eventHandlers:
-        - event: StrategyAdded(indexed address,uint256,uint256,uint256)
-          handler: handleStrategyAdded
-        - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleStrategyReported
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-      callHandlers:
-        - function: deposit(uint256)
-          handler: handleDeposit
-        - function: withdraw(uint256)
-          handler: handleWithdrawal   
-
-  # 3 Vault DAI
-  - kind: ethereum/contract
-    name: yvDAI
-    network: {{network}}
-    source:
-      startBlock: 11390000
-      address: '0xBFa4D8AA6d8a379aBFe7793399D3DdaCC5bBECBB'
-      abi: Vault
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.3
-      language: wasm/assemblyscript
-      file: ./src/mappings/vaults/yvDAIVaultMappings.ts
-      entities:
-        - Vault
-        - EthTransaction
-        - Strategy
-        - VaultUpdate
-        - Operation
-        - Transfer
-        - Account
-        - AccountUpdate
-        - AccountVaultBalance
-        - Token
-      abis:
-        - name: ERC20
-          file: ./abis/ERC20Detailed.json
-        - name: Vault
-          file: ./abis/Vault.json
-      eventHandlers:
-        - event: StrategyAdded(indexed address,uint256,uint256,uint256)
-          handler: handleStrategyAdded
-        - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleStrategyReported
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-      callHandlers:
-        - function: deposit(uint256)
-          handler: handleDeposit
-        - function: withdraw(uint256)
-          handler: handleWithdrawal   
+ 
 templates:
   # 1 Vault (template)
   - name: Vault
@@ -132,7 +49,6 @@ templates:
         - Vault
         - Strategy
         - VaultUpdate
-        - Operation
         - Transfer
         - Account
         - AccountUpdate
@@ -148,10 +64,12 @@ templates:
           handler: handleStrategyAdded
         - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleStrategyReported
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-      callHandlers:
-        - function: deposit(uint256)
-          handler: handleDeposit
-        - function: withdraw(uint256)
-          handler: handleWithdrawal
+        # TODO: failing in graph sync at block #11579817  
+        # - event: Transfer(indexed address,indexed address,uint256)
+        #   handler: handleTransfer
+      # TODO: failing in graph sync at block #11595706  
+      # callHandlers:
+      #   - function: deposit(uint256)
+      #     handler: handleDeposit
+      #   - function: withdraw(uint256)
+      #     handler: handleWithdrawal

@@ -13,7 +13,8 @@ export function getOrCreateToken(address: Address): Token {
   
     if (token == null) {
       token = new Token(id);
-      token.address = address;
+      // TODO: check if this field is needed since we already have id from address
+      // token.address = address;
   
       let erc20Contract = ERC20.bind(address);
       let decimals = erc20Contract.try_decimals();

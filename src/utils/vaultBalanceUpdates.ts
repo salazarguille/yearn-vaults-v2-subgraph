@@ -4,7 +4,6 @@ import {
     Transfer, 
     VaultUpdate, 
     Vault,
-    Operation,
 } from '../../generated/schema';
 
 import {
@@ -17,32 +16,33 @@ import { getOrCreateVault } from './vault';
 import { getOrCreateToken } from './token';
 import { BIGINT_ZERO, DEFAULT_DECIMALS } from '../utils/constants';
 
-export function createOperation(
-    id: string,
-    vaultId: string,
-    accountId: string,
-    amount: BigInt,
-    shares: BigInt,
-    timestamp: BigInt,
-    blockNumber: BigInt,
-    type: string,
-  ): Operation {
-    let operation = new Operation(id);
-    operation.vault = vaultId;
-    operation.account = accountId;
-    operation.amount = amount;
-    operation.shares = shares;
+// TODO: remove if not needed in final implementation
+// export function createOperation(
+//     id: string,
+//     vaultId: string,
+//     accountId: string,
+//     amount: BigInt,
+//     shares: BigInt,
+//     timestamp: BigInt,
+//     blockNumber: BigInt,
+//     type: string,
+//   ): Operation {
+//     let operation = new Operation(id);
+//     operation.vault = vaultId;
+//     operation.account = accountId;
+//     operation.amount = amount;
+//     operation.shares = shares;
   
-    operation.shares = shares;
-    operation.timestamp = timestamp;
-    operation.blockNumber = blockNumber;
+//     operation.shares = shares;
+//     operation.timestamp = timestamp;
+//     operation.blockNumber = blockNumber;
   
-    operation.type = type;
+//     operation.type = type;
   
-    operation.save();
+//     operation.save();
   
-    return operation as Operation;
-  }
+//     return operation as Operation;
+//   }
 
 
 export function createVaultUpdate(
@@ -63,36 +63,38 @@ export function createVaultUpdate(
     vaultUpdate.timestamp = timestamp;
     vaultUpdate.blockNumber = blockNumber;
   
-    vaultUpdate.balance = deposits.minus(withdrawals);
-    vaultUpdate.deposits = deposits;
-    vaultUpdate.withdrawals = withdrawals;
+    // TODO: refactor to new schema
+    // vaultUpdate.balance = deposits.minus(withdrawals);
+    // vaultUpdate.deposits = deposits;
+    // vaultUpdate.withdrawals = withdrawals;
   
-    vaultUpdate.shareBalance = sharesMinted.minus(sharesBurnt);
-    vaultUpdate.sharesMinted = sharesMinted;
-    vaultUpdate.sharesBurnt = sharesBurnt;
+    // vaultUpdate.shareBalance = sharesMinted.minus(sharesBurnt);
+    // vaultUpdate.sharesMinted = sharesMinted;
+    // vaultUpdate.sharesBurnt = sharesBurnt;
     // NOTE: don't update vaultUpdate.sharesBurnt
   
     vaultUpdate.vault = vault.id;
-    vaultUpdate.pricePerFullShare = pricePerFullShare;
+    // TODO: refactor this to new schema
+    // vaultUpdate.pricePerFullShare = pricePerFullShare;
   
-    let vaultUpdates = vault.vaultUpdates;
-    if (vaultUpdates.length > 0) {
-      let previousVaultUpdate = VaultUpdate.load(vaultUpdates[vaultUpdates.length - 1]);
+    // let vaultUpdates = vault.vaultUpdates;
+    // if (vaultUpdates.length > 0) {
+    //   let previousVaultUpdate = VaultUpdate.load(vaultUpdates[vaultUpdates.length - 1]);
   
-      // TODO: add update algorithm
-      vaultUpdate.withdrawalFees = previousVaultUpdate.withdrawalFees;
-      vaultUpdate.performanceFees = previousVaultUpdate.performanceFees;
-      vaultUpdate.earnings = vaultUpdate.withdrawalFees.plus(vaultUpdate.performanceFees);
-    } else {
-      vaultUpdate.withdrawalFees = BIGINT_ZERO;
-      vaultUpdate.performanceFees = BIGINT_ZERO;
-      vaultUpdate.earnings = BIGINT_ZERO;
-    }
+    //   // TODO: add update algorithm
+    //   vaultUpdate.withdrawalFees = previousVaultUpdate.withdrawalFees;
+    //   vaultUpdate.performanceFees = previousVaultUpdate.performanceFees;
+    //   vaultUpdate.earnings = vaultUpdate.withdrawalFees.plus(vaultUpdate.performanceFees);
+    // } else {
+    //   vaultUpdate.withdrawalFees = BIGINT_ZERO;
+    //   vaultUpdate.performanceFees = BIGINT_ZERO;
+    //   vaultUpdate.earnings = BIGINT_ZERO;
+    // }
   
-    vaultUpdates.push(vaultUpdate.id);
-    vault.vaultUpdates = vaultUpdates;
+    // vaultUpdates.push(vaultUpdate.id);
+    // vault.vaultUpdates = vaultUpdates;
   
-    vaultUpdate.save();
+    // vaultUpdate.save();
     vault.save();
   
     return vaultUpdate as VaultUpdate;
@@ -132,17 +134,18 @@ export function createVaultUpdate(
     //   blockNumber: call.block.number,
     //   type: 'Withdrawal',
     // };
-  
-    createOperation(
-      id,
-      vault.id,
-      account.id,
-      inputAmount,
-      shares,
-      blockTimestamp,
-      blockNumber,
-      'Deposit',
-    );
+ 
+    // TODO: remove this if no longer needed for final impl
+    // createOperation(
+    //   id,
+    //   vault.id,
+    //   account.id,
+    //   inputAmount,
+    //   shares,
+    //   blockTimestamp,
+    //   blockNumber,
+    //   'Deposit',
+    // );
   
     // TODO: vaultUpdate
   
@@ -262,16 +265,17 @@ export function mapDeposit(call: DepositCall): void {
     .times(inputShares)
     .div(totalSupply);
 
-  createOperation(
-    id,
-    vault.id,
-    account.id,
-    amount,
-    inputShares,
-    blockTimestamp,
-    blockNumber,
-    'Withdrawal',
-  );
+   // TODO: refactor this if needed for final implementation 
+  // createOperation(
+  //   id,
+  //   vault.id,
+  //   account.id,
+  //   amount,
+  //   inputShares,
+  //   blockTimestamp,
+  //   blockNumber,
+  //   'Withdrawal',
+  // );
 
   let vaultUpdateId = buildUpdateId(
     vaultAddress,
@@ -365,16 +369,23 @@ export function mapDeposit(call: DepositCall): void {
   ): void {
   let id = buildId(transactionHash, transactionIndex);
 
-  let token = getOrCreateToken(address);
+
+  let vaultSharesToken = getOrCreateToken(address);
+  let vault = getOrCreateVault(address, false);
   let sender = getOrCreateAccount(from);
   let receiver = getOrCreateAccount(to);
+  
 
   let transfer = new Transfer(id.toString());
+
   transfer.from = sender.id;
   transfer.to = receiver.id;
 
-  transfer.token = token.id;
-  transfer.shares = value;
+  transfer.vault = vault.id;
+  transfer.token = vault.token;
+  transfer.shareToken = vaultSharesToken.id;
+  // TODO: refactor this
+  // transfer.shares = value;
   transfer.amount = totalAssets
     .times(value)
     .div(totalSupply);
