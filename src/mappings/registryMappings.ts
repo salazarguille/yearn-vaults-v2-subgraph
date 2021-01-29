@@ -3,9 +3,10 @@ import {
   NewRelease as NewReleaseEvent,
   NewVault as NewVaultEvent,
   NewExperimentalVault as NewExperimentalVaultEvent,
+  VaultTagged as VaultTaggedEvent,
 } from "../../generated/Registry/Registry";
 import { createEthTransaction } from "../utils/commons";
-import { releaseVault, createVault, getOrCreateVault } from "../utils/vault";
+import { releaseVault, createVault, getOrCreateVault, tagVault } from "../utils/vault";
 
 export function handleNewRelease(event: NewReleaseEvent): void {
   releaseVault(
@@ -39,5 +40,12 @@ export function handleNewExperimentalVault(event: NewExperimentalVaultEvent): vo
     BigInt.fromI32(-1),
     true,
     event,
+  )
+}
+
+export function handleVaultTagged(event: VaultTaggedEvent): void {
+  tagVault(
+    event.params.vault,
+    event.params.tag
   )
 }

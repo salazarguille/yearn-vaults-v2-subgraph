@@ -1,4 +1,4 @@
-import { Address, ethereum, BigInt  } from "@graphprotocol/graph-ts";
+import { Address, ethereum, BigInt, log  } from "@graphprotocol/graph-ts";
 import {
   Vault,
 } from "../../generated/schema";
@@ -146,4 +146,22 @@ export function createVault(
       entity.strategies = strategies
       entity.save()
     }
+  }
+
+  export function tagVault(
+    vault: Address,
+    tag: string
+  ): Vault {
+    let id = vault.toHexString()
+    log.info("Processing tag for vault address: {}", [id])
+    let entity = Vault.load(id)
+    if(entity == null) {
+      log.warning("Vault not found. Vault address: {}", [id])
+    } else {
+      let tags = entity.tags
+      tags.push(tag)
+      entity.tags = tags
+    }
+    entity.save()
+    return entity as Vault
   }
