@@ -31,7 +31,7 @@ dataSources:
           handler: handleNewVault
         - event: NewExperimentalVault(indexed address,indexed address,address,string)
           handler: handleNewExperimentalVault
-        - event: Vaultaddress,string)
+        - event: VaultTagged(address,string)
           handler: handleVaultTagged
       file: ./src/mappings/registryMappings.ts
  

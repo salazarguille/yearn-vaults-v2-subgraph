@@ -158,9 +158,7 @@ export function createVault(
     if(entity == null) {
       log.warning("Vault not found. Vault address: {}", [id])
     } else {
-      let tags = entity.tags
-      tags.push(tag)
-      entity.tags = tags
+      entity.tags = tag.split(",")
     }
     entity.save()
     return entity as Vault
