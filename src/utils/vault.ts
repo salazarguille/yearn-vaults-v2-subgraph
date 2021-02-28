@@ -159,7 +159,7 @@ export function createVault(
       log.warning("Vault not found. Vault address: {}", [id])
     } else {
       entity.tags = tag.split(",")
+      entity.save()
     }
-    entity.save()
     return entity as Vault
   }
