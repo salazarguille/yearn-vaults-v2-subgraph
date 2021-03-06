@@ -1,4 +1,3 @@
-import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
 import {
   StrategyAdded as StrategyAddedEvent,
   StrategyReported as StrategyReportedEvent,
@@ -7,57 +6,26 @@ import {
   Withdraw1Call as WithdrawCall,
   Vault as VaultContract,
 } from "../../generated/Registry/Vault";
-import { Strategy, StrategyReport, Vault } from "../../generated/schema";
 import {
   internalMapDeposit,
   internalMapTransfer,
   internalMapWithdrawal,
 } from "../utils/vaultBalanceUpdates";
-import { buildIdFromEvent, createEthTransaction, getTimestampInMillis } from "../utils/commons";
-import { getOrCreateVault } from "../utils/vault";
+import { createEthTransaction } from "../utils/commons";
 import { createStrategy, reportStrategy } from "../utils/strategy";
 
-
-export function addStrategyToVault(
-  transactionId: string,
-  vaultAddress: Address,
-  strategy: Address,
-  debtLimit: BigInt,
-  performanceFee: BigInt,
-  rateLimit: BigInt,
-  event: ethereum.Event,
-): void {
-  let entity = getOrCreateVault(vaultAddress, false)
-  if(entity !== null) {
-    let newStrategy = createStrategy(
-      transactionId,
-      strategy,
-      vaultAddress,
-      debtLimit,
-      rateLimit,
-      performanceFee,
-      event
-    )
-    // NOTE: commented since field is derived
-    // let strategies = entity.strategies
-    // strategies.push(newStrategy.id)
-    // entity.strategies = strategies
-    // entity.save()
-  }
-}
 
 export function handleStrategyAdded(event: StrategyAddedEvent): void {
   let ethTransaction = createEthTransaction(event, "StrategyAddedEvent")
 
-  // TODO: refactor to createStrategy since derived links vault + strat
-  addStrategyToVault(
+  createStrategy(
     ethTransaction.id,
-    event.address,
     event.params.strategy,
+    event.transaction.from,
     event.params.debtLimit,
-    event.params.performanceFee,
     event.params.rateLimit,
-    event
+    event.params.performanceFee,
+    event,
   )
 }
 

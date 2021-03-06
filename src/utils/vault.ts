@@ -120,34 +120,6 @@ export function createVault(
     return entity
   }
 
-  export function addStrategyToVault(
-    transactionId: string,
-    vaultAddress: Address,
-    strategy: Address,
-    debtLimit: BigInt,
-    performanceFee: BigInt,
-    rateLimit: BigInt,
-    event: ethereum.Event,
-  ): void {
-    let id = vaultAddress.toHexString()
-    let entity = Vault.load(id)
-    if(entity !== null) {
-      let newStrategy = createStrategy(
-        transactionId,
-        strategy,
-        vaultAddress,
-        debtLimit,
-        rateLimit,
-        performanceFee,
-        event
-      )
-      let strategies = entity.strategies
-      strategies.push(newStrategy.id)
-      entity.strategies = strategies
-      entity.save()
-    }
-  }
-
   export function tagVault(
     vault: Address,
     tag: string
