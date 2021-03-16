@@ -114,15 +114,6 @@ export class Transaction extends Entity {
     this.set("value", Value.fromBigInt(value));
   }
 
-  get contract(): Bytes {
-    let value = this.get("contract");
-    return value.toBytes();
-  }
-
-  set contract(value: Bytes) {
-    this.set("contract", Value.fromBytes(value));
-  }
-
   get timestamp(): BigInt {
     let value = this.get("timestamp");
     return value.toBigInt();
@@ -239,6 +230,15 @@ export class Vault extends Entity {
     this.set("id", Value.fromString(value));
   }
 
+  get transaction(): string {
+    let value = this.get("transaction");
+    return value.toString();
+  }
+
+  set transaction(value: string) {
+    this.set("transaction", Value.fromString(value));
+  }
+
   get token(): string {
     let value = this.get("token");
     return value.toString();
@@ -264,6 +264,23 @@ export class Vault extends Entity {
 
   set classification(value: string) {
     this.set("classification", Value.fromString(value));
+  }
+
+  get latestUpdate(): string | null {
+    let value = this.get("latestUpdate");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set latestUpdate(value: string | null) {
+    if (value === null) {
+      this.unset("latestUpdate");
+    } else {
+      this.set("latestUpdate", Value.fromString(value as string));
+    }
   }
 
   get historicalUpdates(): Array<string> {
@@ -309,15 +326,6 @@ export class Vault extends Entity {
 
   set transfers(value: Array<string>) {
     this.set("transfers", Value.fromStringArray(value));
-  }
-
-  get transaction(): string {
-    let value = this.get("transaction");
-    return value.toString();
-  }
-
-  set transaction(value: string) {
-    this.set("transaction", Value.fromString(value));
   }
 
   get tags(): Array<string> {
@@ -557,15 +565,6 @@ export class VaultUpdate extends Entity {
   set performanceFees(value: BigInt) {
     this.set("performanceFees", Value.fromBigInt(value));
   }
-
-  get strategistFees(): BigInt {
-    let value = this.get("strategistFees");
-    return value.toBigInt();
-  }
-
-  set strategistFees(value: BigInt) {
-    this.set("strategistFees", Value.fromBigInt(value));
-  }
 }
 
 export class Account extends Entity {
@@ -672,6 +671,24 @@ export class Deposit extends Entity {
 
   set id(value: string) {
     this.set("id", Value.fromString(value));
+  }
+
+  get timestamp(): BigInt {
+    let value = this.get("timestamp");
+    return value.toBigInt();
+  }
+
+  set timestamp(value: BigInt) {
+    this.set("timestamp", Value.fromBigInt(value));
+  }
+
+  get blockNumber(): BigInt {
+    let value = this.get("blockNumber");
+    return value.toBigInt();
+  }
+
+  set blockNumber(value: BigInt) {
+    this.set("blockNumber", Value.fromBigInt(value));
   }
 
   get account(): string {
@@ -1004,6 +1021,15 @@ export class AccountVaultPosition extends Entity {
     this.set("shareToken", Value.fromString(value));
   }
 
+  get transaction(): string {
+    let value = this.get("transaction");
+    return value.toString();
+  }
+
+  set transaction(value: string) {
+    this.set("transaction", Value.fromString(value));
+  }
+
   get latestUpdate(): string {
     let value = this.get("latestUpdate");
     return value.toString();
@@ -1013,13 +1039,13 @@ export class AccountVaultPosition extends Entity {
     this.set("latestUpdate", Value.fromString(value));
   }
 
-  get historicalUpdates(): Array<string> {
-    let value = this.get("historicalUpdates");
+  get updates(): Array<string> {
+    let value = this.get("updates");
     return value.toStringArray();
   }
 
-  set historicalUpdates(value: Array<string>) {
-    this.set("historicalUpdates", Value.fromStringArray(value));
+  set updates(value: Array<string>) {
+    this.set("updates", Value.fromStringArray(value));
   }
 
   get balanceShares(): BigInt {
@@ -1104,6 +1130,24 @@ export class AccountVaultPositionUpdate extends Entity {
     this.set("account", Value.fromString(value));
   }
 
+  get accountVaultPosition(): string {
+    let value = this.get("accountVaultPosition");
+    return value.toString();
+  }
+
+  set accountVaultPosition(value: string) {
+    this.set("accountVaultPosition", Value.fromString(value));
+  }
+
+  get transaction(): string {
+    let value = this.get("transaction");
+    return value.toString();
+  }
+
+  set transaction(value: string) {
+    this.set("transaction", Value.fromString(value));
+  }
+
   get deposits(): BigInt {
     let value = this.get("deposits");
     return value.toBigInt();
@@ -1138,51 +1182,6 @@ export class AccountVaultPositionUpdate extends Entity {
 
   set sharesBurnt(value: BigInt) {
     this.set("sharesBurnt", Value.fromBigInt(value));
-  }
-
-  get tokensSent(): BigInt {
-    let value = this.get("tokensSent");
-    return value.toBigInt();
-  }
-
-  set tokensSent(value: BigInt) {
-    this.set("tokensSent", Value.fromBigInt(value));
-  }
-
-  get tokensReceived(): BigInt {
-    let value = this.get("tokensReceived");
-    return value.toBigInt();
-  }
-
-  set tokensReceived(value: BigInt) {
-    this.set("tokensReceived", Value.fromBigInt(value));
-  }
-
-  get sharesSent(): BigInt {
-    let value = this.get("sharesSent");
-    return value.toBigInt();
-  }
-
-  set sharesSent(value: BigInt) {
-    this.set("sharesSent", Value.fromBigInt(value));
-  }
-
-  get sharesReceived(): BigInt {
-    let value = this.get("sharesReceived");
-    return value.toBigInt();
-  }
-
-  set sharesReceived(value: BigInt) {
-    this.set("sharesReceived", Value.fromBigInt(value));
-  }
-
-  get transaction(): string {
-    let value = this.get("transaction");
-    return value.toString();
-  }
-
-  set transaction(value: string) {
-    this.set("transaction", Value.fromString(value));
   }
 
   get vaultUpdate(): string {

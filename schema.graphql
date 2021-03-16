@@ -7,9 +7,9 @@
 # Use plurals when referring to Tokens or Shares (e.g. totalShares, balanceTokens)
 
 type Transaction @entity {
-  "Transaction-log"
+  "Transaction hash"
   id: ID!
-  "The event name"
+  "The event name / call stacktrace"
   event: String!
   "The transaction sender"
   from: Bytes!
@@ -25,8 +25,6 @@ type Transaction @entity {
   to: Bytes!
   "Ether value sent in the transaction"
   value: BigInt!
-  "Contract address that emitted the event"
-  contract: Bytes!
   "Timestamp when the transaction was executed"
   timestamp: BigInt!
   "Gas limit used in the transaction"
@@ -81,6 +79,8 @@ enum VaultClassification {
 type Vault @entity {
   "Vault address"
   id: ID!
+  "Ethereum Transaction"
+  transaction: Transaction!
   "Token this Vault will accrue"
   token: Token!
   "Token representing Shares in the Vault"
@@ -91,8 +91,8 @@ type Vault @entity {
   classification: VaultClassification!
   # "Release Information"
   # release: VaultRelease!
-  # "Latest Vault Update"
-  # latestUpdate: VaultUpdate
+  "Latest Vault Update"
+  latestUpdate: VaultUpdate
   "All Vault Updates"
   historicalUpdates: [VaultUpdate!]! @derivedFrom(field: "vault")
   "Strategies for this Vault"
@@ -103,8 +103,6 @@ type Vault @entity {
   withdrawals: [Withdrawal!]! @derivedFrom(field: "vault")
   "Transfers of Vault Shares"
   transfers: [Transfer!]! @derivedFrom(field: "vault")
-  "Ethereum Transaction"
-  transaction: Transaction!
   "Tags attached to the Vault"
   tags: [String!]!
   "Balance of Tokens in the Vault and its Strategies"
@@ -144,9 +142,9 @@ type VaultUpdate @entity {
 
   ### BALANCES AND SHARES
 
-  "Tokens Deposited"
+  "Sum of tokens deposited"
   tokensDeposited: BigInt!
-  "Tokens Withdrawn"
+  "Sum of tokens withdrawn"
   tokensWithdrawn: BigInt!
   "Sum of Shares minted over all time"
   sharesMinted: BigInt!
@@ -166,8 +164,6 @@ type VaultUpdate @entity {
   managementFees: BigInt!
   "Performance fees in Shares"
   performanceFees: BigInt!
-  "Strategist fees in Shares"
-  strategistFees: BigInt!
 }
 
 type Account @entity {
@@ -190,6 +186,10 @@ type Account @entity {
 type Deposit @entity {
   "Transaction-Log"
   id: ID!
+  "Timestamp of update"
+  timestamp: BigInt!
+  "Block number of update"
+  blockNumber: BigInt!
   "Account making Deposit"
   account: Account!
   "Vault deposited into"
@@ -257,10 +257,12 @@ type AccountVaultPosition @entity {
   token: Token!
   "Vault share token"
   shareToken: Token!
+  "Created in transaction"
+  transaction: Transaction!
   "Latest account update for this Vault"
   latestUpdate: AccountVaultPositionUpdate!
   "Account updates over time"
-  historicalUpdates: [AccountVaultPositionUpdate!]!
+  updates: [AccountVaultPositionUpdate!]! @derivedFrom(field: "accountVaultPosition")
 
   "Share balance"
   balanceShares: BigInt!
@@ -275,31 +277,32 @@ type AccountVaultPositionUpdate @entity {
   timestamp: BigInt!
   "Block number"
   blockNumber: BigInt!
-  "The Account this update applies to"
+  "Account that owns position update"
   account: Account!
-
-  "Token deposits"
-  deposits: BigInt!
-  "Token withdrawals"
-  withdrawals: BigInt!
-
-  "Share tokens minted"
-  sharesMinted: BigInt!
-  "Share tokens burnt"
-  sharesBurnt: BigInt!
-
-  "Tokens sent"
-  tokensSent: BigInt!
-  "Tokens received"
-  tokensReceived: BigInt!
-
-  "Share tokens sent"
-  sharesSent: BigInt!
-  "Share tokens received"
-  sharesReceived: BigInt!
-
+  "The account vault position that this update applies to"
+  accountVaultPosition: AccountVaultPosition!
   "Ethereum Transaction"
   transaction: Transaction!
+
+  "Sum of token deposits"
+  deposits: BigInt!
+  "Sum of token withdrawals"
+  withdrawals: BigInt!
+
+  "Sum of share tokens minted"
+  sharesMinted: BigInt!
+  "Sum of share tokens burnt"
+  sharesBurnt: BigInt!
+
+  # "Tokens sent"
+  # tokensSent: BigInt!
+  # "Tokens received"
+  # tokensReceived: BigInt!
+
+  # "Share tokens sent"
+  # sharesSent: BigInt!
+  # "Share tokens received"
+  # sharesReceived: BigInt!
 
   "Vault Update"
   vaultUpdate: VaultUpdate!
@@ -315,6 +318,10 @@ type Strategy @entity {
   id: ID!
   "Strategy name."
   name: String!
+  "Blocknumber the vault information was most recently updated."
+  blockNumber: BigInt!
+  "Timestamp the vault information was most recently updated."
+  timestamp: BigInt!
   "Ethereum Transaction"
   transaction: Transaction!
   "The Strategy address."
@@ -327,16 +334,10 @@ type Strategy @entity {
   rateLimit: BigInt!
   "Defines the strategist's fee (basis points)."
   performanceFeeBps: Int!
-  "Blocknumber the vault information was most recently updated."
-  blockNumber: BigInt!
-  "Timestamp the vault information was most recently updated."
-  timestamp: BigInt!
-
-  "The reports created by this strategy."
-  reports: [StrategyReport!]!
   "The latest report for this Strategy"
   latestReport: StrategyReport
-
+  "The reports created by this strategy."
+  reports: [StrategyReport!]! @derivedFrom(field: "strategy")
   "harvest() calls"
   harvests: [Harvest!]! @derivedFrom(field: "strategy")
 }
@@ -347,7 +348,7 @@ type StrategyReport @entity {
   "Ethereum Transaction"
   transaction: Transaction!
   "The Strategy reference."
-  strategy: Strategy! @relation
+  strategy: Strategy!
   "The reported gain amount for the strategy."
   gain: BigInt!
   "The reported loss amount for the strategy."
