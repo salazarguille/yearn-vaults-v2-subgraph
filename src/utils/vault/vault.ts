@@ -5,7 +5,6 @@ import { Vault as VaultContract } from '../../../generated/Registry/Vault';
 import { Vault as VaultTemplate } from '../../../generated/templates';
 import { BIGINT_ZERO } from '../constants';
 import { getOrCreateToken } from '../token';
-import { createStrategy } from '../strategy';
 import * as depositLibrary from '../deposit';
 import * as accountLibrary from '../account/account';
 import * as accountVaultPositionLibrary from '../account/vault-position';
@@ -40,10 +39,10 @@ const createNewVaultFromAddress = (
   vaultEntity.managementFeeBps = 0;
   vaultEntity.performanceFeeBps = 0;
 
-  // vaultEntity.tokensDepositLimit = vaultContract.depositLimit();
-  // vaultEntity.sharesSupply = vaultContract.totalSupply();
-  // vaultEntity.managementFeeBps = vaultContract.managementFee().toI32();
-  // vaultEntity.performanceFeeBps = vaultContract.performanceFee().toI32();
+  // vaultEntity.tokensDepositLimit = vaultContract.depositLimit()
+  // vaultEntity.sharesSupply = vaultContract.totalSupply()
+  // vaultEntity.managementFeeBps = vaultContract.managementFee().toI32()
+  // vaultEntity.performanceFeeBps = vaultContract.performanceFee().toI32()
 
   // vault fields
   vaultEntity.activation = vaultContract.activation();
@@ -54,8 +53,7 @@ const createNewVaultFromAddress = (
 
 export function getOrCreate(
   vaultAddress: Address,
-  transactionHash: string,
-  createTemplate: boolean
+  transactionHash: string
 ): Vault {
   log.debug('[Vault] Get or create', []);
   let id = vaultAddress.toHexString();
@@ -64,12 +62,10 @@ export function getOrCreate(
   if (vault == null) {
     vault = createNewVaultFromAddress(vaultAddress, transactionHash);
 
-    if (createTemplate) {
-      VaultTemplate.create(vaultAddress);
-    }
+    VaultTemplate.create(vaultAddress);
   }
 
-  return vault as Vault;
+  return vault!;
 }
 
 export function create(
@@ -78,7 +74,6 @@ export function create(
   classification: string,
   apiVersion: string,
   deploymentId: BigInt,
-  createTemplate: boolean,
   event: ethereum.Event
 ): Vault {
   log.info('[Vault] Create vault', []);
@@ -89,9 +84,7 @@ export function create(
     vaultEntity.classification = classification;
     // vaultEntity.deploymentId = deploymentId
     vaultEntity.apiVersion = apiVersion;
-    if (createTemplate) {
-      VaultTemplate.create(vault);
-    }
+    VaultTemplate.create(vault);
   } else {
     // NOTE: vault is experimental but being endorsed
     if (vaultEntity.classification !== classification) {
@@ -101,7 +94,7 @@ export function create(
   // vaultEntity.blockNumber = event.block.number
   // vaultEntity.timestamp = getTimestampInMillis(event)
   vaultEntity.save();
-  return vaultEntity as Vault;
+  return vaultEntity!;
 }
 
 // TODO: implement this
@@ -123,31 +116,6 @@ export function release(
     // entity.save()
   }
   return entity;
-}
-
-export function addStrategy(
-  transactionId: string,
-  vaultAddress: Address,
-  strategy: Address,
-  debtLimit: BigInt,
-  performanceFee: BigInt,
-  rateLimit: BigInt,
-  event: ethereum.Event
-): void {
-  let id = vaultAddress.toHexString();
-  let vault = Vault.load(id); // get or create ?
-  if (vault !== null) {
-    createStrategy(
-      transactionId,
-      strategy,
-      vaultAddress,
-      debtLimit,
-      rateLimit,
-      performanceFee,
-      event
-    );
-    vault.save();
-  }
 }
 
 export function tag(vault: Address, tag: string): Vault {
@@ -172,7 +140,7 @@ export function deposit(
 ): void {
   log.debug('[Vault] Deposit', []);
   let account = accountLibrary.getOrCreate(receiver);
-  let vault = getOrCreate(to, transaction.id, false);
+  let vault = getOrCreate(to, transaction.id);
 
   let vaultPositionResponse = accountVaultPositionLibrary.deposit(
     account,

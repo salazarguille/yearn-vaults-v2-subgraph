@@ -25,7 +25,6 @@ export function handleNewVault(event: NewVaultEvent): void {
     'Endorsed',
     event.params.api_version,
     event.params.deployment_id,
-    true,
     event
   );
 }
@@ -43,7 +42,6 @@ export function handleNewExperimentalVault(
     'Experimental',
     event.params.api_version,
     BigInt.fromI32(-1),
-    true,
     event
   );
 }

@@ -12,7 +12,6 @@ export function getOrCreateTransactionFromEvent(
     event.block,
     action
   );
-  log.debug('[Transaction] Get or create transaction from event finish', []);
   return transaction;
 }
 
@@ -26,7 +25,6 @@ export function getOrCreateTransactionFromCall(
     call.block,
     action
   );
-  log.debug('[Transaction] Get or create transaction from call finish', []);
   return transaction;
 }
 
@@ -35,10 +33,10 @@ function _getOrCreateTransaction(
   block: ethereum.Block,
   action: string
 ): Transaction {
+  log.debug('[Transaction] Get or create', []);
   let id = ethTransaction.hash.toHexString();
   let transaction = Transaction.load(id);
   if (transaction == null) {
-    log.debug('[Transaction] Creating with id {}', [id]);
     transaction = new Transaction(id);
     transaction.from = ethTransaction.from;
     transaction.gasPrice = ethTransaction.gasPrice;
@@ -52,8 +50,6 @@ function _getOrCreateTransaction(
     transaction.blockNumber = block.number;
     transaction.event = action;
     transaction.save();
-  } else {
-    log.debug('[Transaction] Found with id {}', [id]);
   }
 
   return transaction!;
