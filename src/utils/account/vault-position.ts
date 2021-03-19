@@ -1,4 +1,4 @@
-import { BigInt, log, Result } from '@graphprotocol/graph-ts';
+import { BigInt, log } from '@graphprotocol/graph-ts';
 import {
   Account,
   AccountVaultPosition,
@@ -90,28 +90,29 @@ export function deposit(
 }
 
 export function withdraw(
-  account: Account,
-  vault: Vault,
-  transactionHash: string,
-  transactionIndex: string,
-  burntShares: BigInt,
-  receivedTokens: BigInt
-): VaultPositionResponse {
-  let id = buildId(account, vault);
-  let accountVaultPosition = AccountVaultPosition.load(id);
-
-  accountVaultPosition.balanceShares = accountVaultPosition.balanceShares.minus(
-    burntShares
+  accountVaultPosition: AccountVaultPosition,
+  latestAccountVaultPositionUpdate: AccountVaultPositionUpdate,
+  withdrawnAmount: BigInt,
+  sharesBurnt: BigInt,
+  transaction: Transaction
+): AccountVaultPositionUpdate {
+  let account = Account.load(accountVaultPosition.account) as Account;
+  let vault = Vault.load(accountVaultPosition.vault) as Vault;
+  let newAccountVaultPositionUpdate = vaultPositionUpdateLibrary.createAccountVaultPositionUpdate(
+    vaultPositionUpdateLibrary.buildIdFromAccountAndTransaction(
+      account,
+      transaction
+    ),
+    account,
+    vault,
+    accountVaultPosition.id,
+    transaction,
+    latestAccountVaultPositionUpdate.deposits,
+    latestAccountVaultPositionUpdate.withdrawals.plus(withdrawnAmount),
+    latestAccountVaultPositionUpdate.sharesMinted,
+    latestAccountVaultPositionUpdate.sharesBurnt.plus(sharesBurnt)
   );
-  accountVaultPosition.balanceTokens = accountVaultPosition.balanceTokens.minus(
-    receivedTokens
-  );
-
-  // let accountVaultPositionUpdate = vaulPositionUpdate.getOrCreate()
-  // accountVaultPosition.latestUpdate = accountVaultPositionUpdate.id
-  // accountVaultPosition.updates.push(accountVaultPositionUpdate.id)
-
+  accountVaultPosition.latestUpdate = newAccountVaultPositionUpdate.id;
   accountVaultPosition.save();
-
-  return VaultPositionResponse.fromValue(accountVaultPosition!, null);
+  return newAccountVaultPositionUpdate;
 }

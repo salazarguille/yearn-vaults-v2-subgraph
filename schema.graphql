@@ -207,7 +207,11 @@ type Deposit @entity {
 type Withdrawal @entity {
   "Transaction-Log"
   id: ID!
-  "Account making Deposit"
+  "Timestamp of update"
+  timestamp: BigInt!
+  "Block number of update"
+  blockNumber: BigInt!
+  "Account making withdraw"
   account: Account!
   "Vault withdrawn from"
   vault: Vault!

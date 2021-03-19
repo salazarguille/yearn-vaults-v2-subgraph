@@ -1,4 +1,4 @@
-import { BigInt, Bytes, ethereum, log, Result } from '@graphprotocol/graph-ts';
+import { BigInt, log } from '@graphprotocol/graph-ts';
 import {
   Account,
   AccountVaultPosition,
@@ -32,11 +32,11 @@ export function buildIdFromAccountAndTransaction(
   );
 }
 
-function createAccountVaultPositionUpdate(
+export function createAccountVaultPositionUpdate(
   id: string,
   account: Account,
   vault: Vault,
-  vaultPositionId: string,
+  accountVaultPositionId: string,
   transaction: Transaction,
   deposits: BigInt,
   withdrawals: BigInt,
@@ -48,7 +48,7 @@ function createAccountVaultPositionUpdate(
   ]);
   let accountVaultPositionUpdate = new AccountVaultPositionUpdate(id);
   accountVaultPositionUpdate.account = account.id;
-  accountVaultPositionUpdate.accountVaultPosition = vaultPositionId;
+  accountVaultPositionUpdate.accountVaultPosition = accountVaultPositionId;
   accountVaultPositionUpdate.timestamp = transaction.timestamp;
   accountVaultPositionUpdate.blockNumber = transaction.blockNumber;
   accountVaultPositionUpdate.transaction = transaction.id;

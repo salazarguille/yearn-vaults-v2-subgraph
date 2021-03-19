@@ -1,4 +1,4 @@
-import { BigInt, Bytes, log } from '@graphprotocol/graph-ts';
+import { BigInt, log } from '@graphprotocol/graph-ts';
 import { Transaction, Vault, VaultUpdate } from '../../../generated/schema';
 import { BIGINT_ZERO } from '../constants';
 
@@ -119,4 +119,34 @@ export function deposit(
   }
 
   return vaultUpdate!;
+}
+
+export function withdraw(
+  vault: Vault,
+  latestVaultUpdate: VaultUpdate,
+  pricePerShare: BigInt,
+  withdrawnAmount: BigInt,
+  sharesBurnt: BigInt,
+  transaction: Transaction
+): VaultUpdate {
+  let vaultUpdateId = buildIdFromVaultAndTransaction(vault, transaction);
+  let newVaultUpdate = createVaultUpdate(
+    vaultUpdateId,
+    vault,
+    transaction,
+    latestVaultUpdate.tokensDeposited,
+    latestVaultUpdate.tokensWithdrawn.plus(withdrawnAmount),
+    latestVaultUpdate.sharesMinted,
+    latestVaultUpdate.sharesBurnt.plus(sharesBurnt),
+    pricePerShare,
+    latestVaultUpdate.returnsGenerated,
+    latestVaultUpdate.totalFees,
+    latestVaultUpdate.managementFees,
+    latestVaultUpdate.performanceFees
+  );
+  vault.sharesSupply = vault.sharesSupply.minus(sharesBurnt);
+  vault.balanceTokens = vault.balanceTokens.minus(withdrawnAmount);
+  vault.latestUpdate = newVaultUpdate.id;
+  vault.save();
+  return newVaultUpdate;
 }

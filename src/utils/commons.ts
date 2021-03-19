@@ -7,6 +7,18 @@ export function getTimeInMillis(time: BigInt): BigInt {
 export function getTimestampInMillis(block: ethereum.Block): BigInt {
   return block.timestamp.times(BigInt.fromI32(1000));
 }
+
+export function buildIdFromVaultIdAndTransaction(
+  id: string,
+  tx: ethereum.Transaction
+): string {
+  return id
+    .concat('-')
+    .concat(tx.hash.toHexString())
+    .concat('-')
+    .concat(tx.index.toString());
+}
+
 // make a derived ID from transaction hash and big number
 export function buildId(tx: Bytes, n: BigInt): string {
   return tx.toHexString().concat('-').concat(n.toString());
