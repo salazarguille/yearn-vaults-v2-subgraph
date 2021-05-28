@@ -494,6 +494,15 @@ export class Vault extends Entity {
     this.set("performanceFeeBps", Value.fromI32(value));
   }
 
+  get rewards(): Bytes {
+    let value = this.get("rewards");
+    return value.toBytes();
+  }
+
+  set rewards(value: Bytes) {
+    this.set("rewards", Value.fromBytes(value));
+  }
+
   get activation(): BigInt {
     let value = this.get("activation");
     return value.toBigInt();
@@ -667,6 +676,23 @@ export class VaultUpdate extends Entity {
 
   set performanceFees(value: BigInt) {
     this.set("performanceFees", Value.fromBigInt(value));
+  }
+
+  get rewards(): Bytes | null {
+    let value = this.get("rewards");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set rewards(value: Bytes | null) {
+    if (value === null) {
+      this.unset("rewards");
+    } else {
+      this.set("rewards", Value.fromBytes(value as Bytes));
+    }
   }
 }
 

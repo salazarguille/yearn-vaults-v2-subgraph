@@ -1,4 +1,4 @@
-import { BigInt, log } from '@graphprotocol/graph-ts';
+import { Address, BigInt, log } from '@graphprotocol/graph-ts';
 import { Transaction, Vault, VaultUpdate } from '../../../generated/schema';
 import { BIGINT_ZERO } from '../constants';
 
@@ -35,7 +35,8 @@ function createVaultUpdate(
   totalFees: BigInt,
   managementFees: BigInt,
   performanceFees: BigInt,
-  balancePosition: BigInt
+  balancePosition: BigInt,
+  rewards: Address | null = null
 ): VaultUpdate {
   log.debug('[VaultUpdate] Creating vault update with id {}', [vault.id]);
   let vaultUpdate = new VaultUpdate(id);
@@ -54,6 +55,7 @@ function createVaultUpdate(
   vaultUpdate.managementFees = managementFees;
   vaultUpdate.performanceFees = performanceFees;
   vaultUpdate.balancePosition = balancePosition;
+  vaultUpdate.rewards = rewards;
 
   if (vault.balanceTokens.gt(balancePosition)) {
     vaultUpdate.returnsGenerated = balancePosition;
@@ -236,6 +238,32 @@ export function managementFeeUpdated(
     managementFee,
     BIGINT_ZERO,
     balancePosition
+  );
+  return newVaultUpdate;
+}
+
+export function rewardsUpdated(
+  vault: Vault,
+  transaction: Transaction,
+  latestVaultUpdate: VaultUpdate,
+  balancePosition: BigInt,
+  rewards: Address
+): VaultUpdate {
+  let vaultUpdateId = buildIdFromVaultAndTransaction(vault, transaction);
+  let newVaultUpdate = createVaultUpdate(
+    vaultUpdateId,
+    vault,
+    transaction,
+    BIGINT_ZERO, // TokensDeposited
+    BIGINT_ZERO, // TokensWithdrawn
+    BIGINT_ZERO, // SharesMinted
+    BIGINT_ZERO, // SharesBurnt
+    latestVaultUpdate.pricePerShare,
+    latestVaultUpdate.totalFees,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    balancePosition,
+    rewards
   );
   return newVaultUpdate;
 }

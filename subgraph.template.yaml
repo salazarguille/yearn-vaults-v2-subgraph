@@ -96,6 +96,8 @@ dataSources:
           handler: handleUpdatePerformanceFee
         - event: UpdateManagementFee(uint256)
           handler: handleUpdateManagementFee
+        - event: UpdateRewards(address)
+          handler: handleUpdateRewards
       callHandlers:
         # V2: addStrategy(strategy,debtRatio,minDebtPerHarvest,maxDebtPerHarvest,performanceFee)
         - function: addStrategy(address,uint256,uint256,uint256,uint256)
@@ -147,6 +149,8 @@ templates:
           handler: handleStrategyAddedToQueue
         - event: StrategyRemovedFromQueue(indexed address)
           handler: handleStrategyRemovedFromQueue
+        - event: UpdateRewards(address)
+          handler: handleUpdateRewards
       callHandlers:
         - function: deposit()
           handler: handleDeposit

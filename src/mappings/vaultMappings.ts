@@ -16,6 +16,7 @@ import {
   UpdateManagementFee as UpdateManagementFeeEvent,
   StrategyAddedToQueue as StrategyAddedToQueueEvent,
   StrategyRemovedFromQueue as StrategyRemovedFromQueueEvent,
+  UpdateRewards as UpdateRewardsEvent,
 } from '../../generated/Registry/Vault';
 import { printCallInfo } from '../utils/commons';
 import { BIGINT_ZERO, ZERO_ADDRESS } from '../utils/constants';
@@ -512,5 +513,21 @@ export function handleStrategyRemovedFromQueue(
     event.params.strategy,
     ethTransaction,
     event
+  );
+}
+
+export function handleUpdateRewards(event: UpdateRewardsEvent): void {
+  let ethTransaction = getOrCreateTransactionFromEvent(
+    event,
+    'UpdateRewardsEvent'
+  );
+
+  let vaultContract = VaultContract.bind(event.address);
+
+  vaultLibrary.handleUpdateRewards(
+    event.address,
+    vaultContract,
+    event.params.rewards,
+    ethTransaction
   );
 }

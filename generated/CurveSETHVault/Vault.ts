@@ -244,6 +244,24 @@ export class StrategyAddedToQueue__Params {
   }
 }
 
+export class UpdateRewards extends ethereum.Event {
+  get params(): UpdateRewards__Params {
+    return new UpdateRewards__Params(this);
+  }
+}
+
+export class UpdateRewards__Params {
+  _event: UpdateRewards;
+
+  constructor(event: UpdateRewards) {
+    this._event = event;
+  }
+
+  get rewards(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+}
+
 export class Vault__strategiesResult {
   value0: BigInt;
   value1: BigInt;

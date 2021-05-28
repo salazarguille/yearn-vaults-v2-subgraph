@@ -507,6 +507,42 @@ export function strategyRemovedFromQueue(
   }
 }
 
+export function handleUpdateRewards(
+  vaultAddress: Address,
+  vaultContract: VaultContract,
+  rewards: Address,
+  ethTransaction: Transaction
+): void {
+  let vault = Vault.load(vaultAddress.toHexString());
+  if (vault !== null) {
+    log.info('Update vault at {} rewards address to {}', [
+      vaultAddress.toHexString(),
+      rewards.toHexString(),
+    ]);
+
+    let latestVaultUpdate = VaultUpdate.load(vault.latestUpdate);
+
+    if (latestVaultUpdate !== null) {
+      let vaultUpdate = vaultUpdateLibrary.rewardsUpdated(
+        vault as Vault,
+        ethTransaction,
+        latestVaultUpdate as VaultUpdate,
+        getBalancePosition(vaultContract),
+        rewards
+      ) as VaultUpdate;
+      vault.latestUpdate = vaultUpdate.id;
+    }
+
+    vault.rewards = rewards;
+    vault.save();
+  } else {
+    log.warning('Failed to update vault at {} rewards address to {}', [
+      vaultAddress.toHexString(),
+      rewards.toHexString(),
+    ]);
+  }
+}
+
 function getBalancePosition(vaultContract: VaultContract): BigInt {
   let totalAssets = vaultContract.totalAssets();
   let pricePerShare = vaultContract.pricePerShare();
