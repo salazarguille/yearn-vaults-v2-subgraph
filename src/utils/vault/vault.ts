@@ -54,6 +54,7 @@ const createNewVaultFromAddress = (
   vaultEntity.sharesSupply = BIGINT_ZERO;
   vaultEntity.managementFeeBps = vaultContract.managementFee().toI32();
   vaultEntity.performanceFeeBps = vaultContract.performanceFee().toI32();
+  vaultEntity.rewards = vaultContract.rewards();
 
   // vaultEntity.tokensDepositLimit = vaultContract.depositLimit()
   // vaultEntity.sharesSupply = vaultContract.totalSupply()
