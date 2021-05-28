@@ -52,8 +52,8 @@ const createNewVaultFromAddress = (
 
   vaultEntity.tokensDepositLimit = BIGINT_ZERO;
   vaultEntity.sharesSupply = BIGINT_ZERO;
-  vaultEntity.managementFeeBps = 0;
-  vaultEntity.performanceFeeBps = 0;
+  vaultEntity.managementFeeBps = vaultContract.managementFee().toI32();
+  vaultEntity.performanceFeeBps = vaultContract.performanceFee().toI32();
 
   // vaultEntity.tokensDepositLimit = vaultContract.depositLimit()
   // vaultEntity.sharesSupply = vaultContract.totalSupply()
@@ -159,13 +159,7 @@ export function deposit(
   log.debug('[Vault] Deposit', []);
   let vaultContract = VaultContract.bind(vaultAddress);
   let account = accountLibrary.getOrCreate(receiver);
-
-  let totalAssets = vaultContract.totalAssets();
-  let decimals = u8(vaultContract.decimals().toI32());
   let pricePerShare = vaultContract.pricePerShare();
-  let balancePosition = totalAssets
-    .times(pricePerShare)
-    .div(BigInt.fromI32(10).pow(decimals));
   let vault = getOrCreate(vaultAddress, transaction);
 
   accountVaultPositionLibrary.deposit(
@@ -186,6 +180,7 @@ export function deposit(
   );
 
   let vaultUpdate: VaultUpdate;
+  let balancePosition = getBalancePosition(vaultContract);
   if (vault.latestUpdate == null) {
     vaultUpdate = vaultUpdateLibrary.firstDeposit(
       vault,
@@ -240,12 +235,7 @@ export function withdraw(
   let vaultContract = VaultContract.bind(vaultAddress);
   let pricePerShare = vaultContract.pricePerShare();
   let account = accountLibrary.getOrCreate(from);
-
-  let totalAssets = vaultContract.totalAssets();
-  let decimals = u8(vaultContract.decimals().toI32());
-  let balancePosition = totalAssets
-    .times(pricePerShare)
-    .div(BigInt.fromI32(10).pow(decimals));
+  let balancePosition = getBalancePosition(vaultContract);
   let vault = getOrCreate(vaultAddress, transaction);
 
   withdrawalLibrary.getOrCreate(
@@ -402,11 +392,7 @@ export function strategyReported(
   ]);
   let vault = getOrCreate(vaultAddress, transaction);
   let latestVaultUpdate = VaultUpdate.load(vault.latestUpdate);
-  let totalAssets = vaultContract.totalAssets();
-  let decimals = u8(vaultContract.decimals().toI32());
-  let balancePosition = totalAssets
-    .times(pricePerShare)
-    .div(BigInt.fromI32(10).pow(decimals));
+  let balancePosition = getBalancePosition(vaultContract);
   // The latest vault update should exist
   if (latestVaultUpdate !== null) {
     vaultUpdateLibrary.strategyReported(
@@ -416,6 +402,78 @@ export function strategyReported(
       pricePerShare,
       balancePosition
     );
+  }
+}
+
+export function performanceFeeUpdated(
+  vaultAddress: Address,
+  ethTransaction: Transaction,
+  vaultContract: VaultContract,
+  performanceFee: BigInt
+): void {
+  let vault = Vault.load(vaultAddress.toHexString());
+  if (vault !== null) {
+    log.info('Vault performance fee updated. Address: {}, To: {}', [
+      vaultAddress.toHexString(),
+      performanceFee.toString(),
+    ]);
+
+    let latestVaultUpdate = VaultUpdate.load(vault.latestUpdate);
+
+    if (latestVaultUpdate !== null) {
+      let vaultUpdate = vaultUpdateLibrary.performanceFeeUpdated(
+        vault as Vault,
+        ethTransaction,
+        latestVaultUpdate as VaultUpdate,
+        getBalancePosition(vaultContract),
+        performanceFee
+      ) as VaultUpdate;
+      vault.latestUpdate = vaultUpdate.id;
+    }
+
+    vault.performanceFeeBps = performanceFee.toI32();
+    vault.save();
+  } else {
+    log.warning('Failed to update performance fee of vault {} to {}', [
+      vaultAddress.toHexString(),
+      performanceFee.toString(),
+    ]);
+  }
+}
+
+export function managementFeeUpdated(
+  vaultAddress: Address,
+  ethTransaction: Transaction,
+  vaultContract: VaultContract,
+  managementFee: BigInt
+): void {
+  let vault = Vault.load(vaultAddress.toHexString());
+  if (vault !== null) {
+    log.info('Vault management fee updated. Address: {}, To: {}', [
+      vaultAddress.toHexString(),
+      managementFee.toString(),
+    ]);
+
+    let latestVaultUpdate = VaultUpdate.load(vault.latestUpdate);
+
+    if (latestVaultUpdate !== null) {
+      let vaultUpdate = vaultUpdateLibrary.managementFeeUpdated(
+        vault as Vault,
+        ethTransaction,
+        latestVaultUpdate as VaultUpdate,
+        getBalancePosition(vaultContract),
+        managementFee
+      ) as VaultUpdate;
+      vault.latestUpdate = vaultUpdate.id;
+    }
+
+    vault.managementFeeBps = managementFee.toI32();
+    vault.save();
+  } else {
+    log.warning('Failed to update management fee of vault {} to {}', [
+      vaultAddress.toHexString(),
+      managementFee.toString(),
+    ]);
   }
 }
 
@@ -447,4 +505,11 @@ export function strategyRemovedFromQueue(
     strategy.inQueue = false;
     strategy.save();
   }
+}
+
+function getBalancePosition(vaultContract: VaultContract): BigInt {
+  let totalAssets = vaultContract.totalAssets();
+  let pricePerShare = vaultContract.pricePerShare();
+  let decimals = u8(vaultContract.decimals().toI32());
+  return totalAssets.times(pricePerShare).div(BigInt.fromI32(10).pow(decimals));
 }

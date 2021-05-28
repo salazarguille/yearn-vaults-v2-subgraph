@@ -189,3 +189,53 @@ export function strategyReported(
   vault.save();
   return newVaultUpdate;
 }
+
+export function performanceFeeUpdated(
+  vault: Vault,
+  transaction: Transaction,
+  latestVaultUpdate: VaultUpdate,
+  balancePosition: BigInt,
+  performanceFee: BigInt
+): VaultUpdate {
+  let vaultUpdateId = buildIdFromVaultAndTransaction(vault, transaction);
+  let newVaultUpdate = createVaultUpdate(
+    vaultUpdateId,
+    vault,
+    transaction,
+    BIGINT_ZERO, // TokensDeposited
+    BIGINT_ZERO, // TokensWithdrawn
+    BIGINT_ZERO, // SharesMinted
+    BIGINT_ZERO, // SharesBurnt
+    latestVaultUpdate.pricePerShare,
+    latestVaultUpdate.totalFees,
+    BIGINT_ZERO,
+    performanceFee,
+    balancePosition
+  );
+  return newVaultUpdate;
+}
+
+export function managementFeeUpdated(
+  vault: Vault,
+  transaction: Transaction,
+  latestVaultUpdate: VaultUpdate,
+  balancePosition: BigInt,
+  managementFee: BigInt
+): VaultUpdate {
+  let vaultUpdateId = buildIdFromVaultAndTransaction(vault, transaction);
+  let newVaultUpdate = createVaultUpdate(
+    vaultUpdateId,
+    vault,
+    transaction,
+    BIGINT_ZERO, // TokensDeposited
+    BIGINT_ZERO, // TokensWithdrawn
+    BIGINT_ZERO, // SharesMinted
+    BIGINT_ZERO, // SharesBurnt
+    latestVaultUpdate.pricePerShare,
+    latestVaultUpdate.totalFees,
+    managementFee,
+    BIGINT_ZERO,
+    balancePosition
+  );
+  return newVaultUpdate;
+}

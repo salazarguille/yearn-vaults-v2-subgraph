@@ -12,6 +12,8 @@ import {
   Withdraw3Call,
   AddStrategyCall as AddStrategyV1Call,
   AddStrategy1Call as AddStrategyV2Call,
+  UpdatePerformanceFee as UpdatePerformanceFeeEvent,
+  UpdateManagementFee as UpdateManagementFeeEvent,
   StrategyAddedToQueue as StrategyAddedToQueueEvent,
   StrategyRemovedFromQueue as StrategyRemovedFromQueueEvent,
 } from '../../generated/Registry/Vault';
@@ -446,6 +448,42 @@ export function handleTransfer(event: TransferEvent): void {
       ]
     );
   }
+}
+
+export function handleUpdatePerformanceFee(
+  event: UpdatePerformanceFeeEvent
+): void {
+  let ethTransaction = getOrCreateTransactionFromEvent(
+    event,
+    'UpdatePerformanceFee'
+  );
+
+  let vaultContract = VaultContract.bind(event.address);
+
+  vaultLibrary.performanceFeeUpdated(
+    event.address,
+    ethTransaction,
+    vaultContract,
+    event.params.performanceFee
+  );
+}
+
+export function handleUpdateManagementFee(
+  event: UpdateManagementFeeEvent
+): void {
+  let ethTransaction = getOrCreateTransactionFromEvent(
+    event,
+    'UpdateManagementFee'
+  );
+
+  let vaultContract = VaultContract.bind(event.address);
+
+  vaultLibrary.managementFeeUpdated(
+    event.address,
+    ethTransaction,
+    vaultContract,
+    event.params.managementFee
+  );
 }
 
 export function handleStrategyAddedToQueue(
