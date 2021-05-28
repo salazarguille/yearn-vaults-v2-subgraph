@@ -137,7 +137,7 @@ type Vault @entity {
   managementFeeBps: Int!
   "Performance fee in basis points"
   performanceFeeBps: Int!
-  "The address where management fees are delivered to"
+  "The address where management fees are paid to"
   rewards: Bytes!
 
   # TODO: refactor these fields out into vault release entity
@@ -186,7 +186,7 @@ type VaultUpdate @entity {
   managementFees: BigInt!
   "Performance fees in Shares"
   performanceFees: BigInt!
-  "The address where management fees are delivered to"
+  "The address where management fees are paid to"
   rewards: Bytes
 }
 
