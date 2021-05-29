@@ -116,26 +116,3 @@ export function handleUpdateManagementFee(
     event.params.managementFee
   );
 }
-
-export function handleUpdateRewards(event: UpdateRewardsEvent): void {
-  if (event.block.number.gt(BigInt.fromI32(11881933))) {
-    log.warning(
-      'CurveSETHVault_UpdateRewardsEvent - Not processing rewards update on vault {} on block {}',
-      [event.address.toHexString(), event.block.number.toString()]
-    );
-    return;
-  }
-  let ethTransaction = getOrCreateTransactionFromEvent(
-    event,
-    'UpdateRewardsEvent'
-  );
-
-  let vaultContract = VaultContract.bind(event.address);
-
-  vaultLibrary.handleUpdateRewards(
-    event.address,
-    vaultContract,
-    event.params.rewards,
-    ethTransaction
-  );
-}
