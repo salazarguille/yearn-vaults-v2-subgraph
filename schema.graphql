@@ -266,12 +266,16 @@ type Transfer @entity {
   token: Token!
   "Number of Tokens redeemable for shares transferred"
   tokenAmount: BigInt!
+  "Token Amount in USDC, null if the transaction was before the oracle was deployed at 12198044"
+  tokenAmountUsdc: BigInt
   "Timestamp of Transfer"
   timestamp: BigInt!
   "Block number of Transfer"
   blockNumber: BigInt!
   "Ethereum Transaction"
   transaction: Transaction!
+  "Whether the transfer was used to pay a performance or management fee"
+  isProtocolFee: Boolean!
 }
 
 type AccountVaultPosition @entity {

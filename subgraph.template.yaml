@@ -24,6 +24,8 @@ dataSources:
           file: ./abis/ERC20Detailed.json
         - name: Vault
           file: ./abis/Vault.json
+        - name: Oracle
+          file: ./abis/Oracle.json
       eventHandlers:
         - event: NewRelease(indexed uint256,address,string)
           handler: handleNewRelease

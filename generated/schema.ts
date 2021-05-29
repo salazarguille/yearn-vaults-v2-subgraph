@@ -1071,6 +1071,23 @@ export class Transfer extends Entity {
     this.set("tokenAmount", Value.fromBigInt(value));
   }
 
+  get tokenAmountUsdc(): BigInt | null {
+    let value = this.get("tokenAmountUsdc");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set tokenAmountUsdc(value: BigInt | null) {
+    if (value === null) {
+      this.unset("tokenAmountUsdc");
+    } else {
+      this.set("tokenAmountUsdc", Value.fromBigInt(value as BigInt));
+    }
+  }
+
   get timestamp(): BigInt {
     let value = this.get("timestamp");
     return value.toBigInt();
@@ -1096,6 +1113,15 @@ export class Transfer extends Entity {
 
   set transaction(value: string) {
     this.set("transaction", Value.fromString(value));
+  }
+
+  get isProtocolFee(): boolean {
+    let value = this.get("isProtocolFee");
+    return value.toBoolean();
+  }
+
+  set isProtocolFee(value: boolean) {
+    this.set("isProtocolFee", Value.fromBoolean(value));
   }
 }
 
