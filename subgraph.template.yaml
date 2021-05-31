@@ -58,6 +58,8 @@ dataSources:
           file: ./abis/ERC20Detailed.json
         - name: Vault
           file: ./abis/Vault.json
+        - name: Oracle
+          file: ./abis/Oracle.json
       eventHandlers:
         - event: NewRelease(indexed uint256,address,string)
           handler: handleNewRelease
@@ -136,6 +138,8 @@ templates:
           file: ./abis/ERC20Detailed.json
         - name: Strategy
           file: ./abis/StrategyAPI.json
+        - name: Oracle
+          file: ./abis/Oracle.json
       eventHandlers:
         - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleStrategyReported
