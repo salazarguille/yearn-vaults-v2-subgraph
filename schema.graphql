@@ -266,8 +266,8 @@ type Transfer @entity {
   token: Token!
   "Number of Tokens redeemable for shares transferred"
   tokenAmount: BigInt!
-  "Token Amount in USDC, null if the transaction was before the oracle was deployed at 12198044"
-  tokenAmountUsdc: BigInt
+  "Token Amount in USDC, 0 if the transaction was before the oracle was deployed at 12198044"
+  tokenAmountUsdc: BigInt!
   "Timestamp of Transfer"
   timestamp: BigInt!
   "Block number of Transfer"

@@ -1071,21 +1071,13 @@ export class Transfer extends Entity {
     this.set("tokenAmount", Value.fromBigInt(value));
   }
 
-  get tokenAmountUsdc(): BigInt | null {
+  get tokenAmountUsdc(): BigInt {
     let value = this.get("tokenAmountUsdc");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+    return value.toBigInt();
   }
 
-  set tokenAmountUsdc(value: BigInt | null) {
-    if (value === null) {
-      this.unset("tokenAmountUsdc");
-    } else {
-      this.set("tokenAmountUsdc", Value.fromBigInt(value as BigInt));
-    }
+  set tokenAmountUsdc(value: BigInt) {
+    this.set("tokenAmountUsdc", Value.fromBigInt(value));
   }
 
   get timestamp(): BigInt {

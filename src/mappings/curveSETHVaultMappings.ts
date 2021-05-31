@@ -4,7 +4,6 @@ import {
   Vault as VaultContract,
   UpdatePerformanceFee as UpdatePerformanceFeeEvent,
   UpdateManagementFee as UpdateManagementFeeEvent,
-  UpdateRewards as UpdateRewardsEvent,
 } from '../../generated/Registry/Vault';
 import { BIGINT_ZERO } from '../utils/constants';
 import * as strategyLibrary from '../utils/strategy/strategy';
