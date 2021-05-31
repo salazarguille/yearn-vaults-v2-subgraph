@@ -7,10 +7,7 @@ export function usdcPrice(tokenAddress: Address, tokenAmount: BigInt): BigInt {
 
   let oracle = OracleContract.bind(Address.fromString(USDC_ORACLE_ADDRESS));
   if (oracle !== null) {
-    let result = oracle.try_getNormalizedValueUsdc(
-      tokenAddress,
-      tokenAmountUsdc
-    );
+    let result = oracle.try_getNormalizedValueUsdc(tokenAddress, tokenAmount);
     if (result.reverted === false) {
       tokenAmountUsdc = result.value;
     }
