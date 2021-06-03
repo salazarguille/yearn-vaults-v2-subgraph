@@ -142,6 +142,8 @@ templates:
           file: ./abis/Oracle.json
       eventHandlers:
         - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleStrategyReported_v0_3_0_v0_3_1
+        - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleStrategyReported
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer

@@ -1,6 +1,7 @@
 import { log } from '@graphprotocol/graph-ts';
 import {
-  StrategyReported as StrategyReportedEvent,
+  StrategyReported as StrategyReported_v0_3_0_v0_3_1_Event,
+  StrategyReported1 as StrategyReported_v0_3_2_Event,
   Deposit1Call as DepositCall,
   Transfer as TransferEvent,
   Withdraw1Call as WithdrawCall,
@@ -84,8 +85,15 @@ export function handleAddStrategy(call: AddStrategyV1Call): void {
   );
 }
 
-export function handleStrategyReported(event: StrategyReportedEvent): void {
-  log.debug('[Vault mappings] Handle strategy reported', []);
+/**
+ * We have two handlers to process the StrategyReported event due to incompatibility in both event structure.
+ * This is for vault versions 0.3.0 and 0.3.1.
+ * If you need 0.3.2 or superior, please see the 'handleStrategyReported' handler.
+ */
+export function handleStrategyReported_v0_3_0_v0_3_1(
+  event: StrategyReported_v0_3_0_v0_3_1_Event
+): void {
+  log.info('[Vault mappings v0_3_0 and v0_3_1] Handle strategy reported', []);
   let ethTransaction = getOrCreateTransactionFromEvent(
     event,
     'StrategyReportedEvent'
@@ -100,6 +108,53 @@ export function handleStrategyReported(event: StrategyReportedEvent): void {
     event.params.totalDebt,
     event.params.debtAdded,
     event.params.debtLimit,
+    BIGINT_ZERO,
+    event
+  );
+
+  log.info(
+    '[Vault mappings] Updating price per share (strategy reported): {}',
+    [event.transaction.hash.toHexString()]
+  );
+  let vaultContractAddress = event.address;
+  let vaultContract = VaultContract.bind(vaultContractAddress);
+  vaultLibrary.strategyReported(
+    ethTransaction,
+    vaultContract,
+    vaultContractAddress,
+    vaultContract.pricePerShare()
+  );
+}
+
+/**
+ * We have two handlers to process the StrategyReported event due to incompatibility in both event structure.
+ * This is for vault versions 0.3.2 or superior.
+ *
+ * This version includes the new field `debtPaid` introduced in the Vault version 0.3.2.
+ *
+ * In case a new structure is implemented, please create a new handler.
+ * If you need 0.3.0 or 0.3.1, please see the 'handleStrategyReported_v0_3_0_v0_3_1' handler.
+ */
+export function handleStrategyReported(
+  event: StrategyReported_v0_3_2_Event
+): void {
+  log.info('[Vault mappings v0_3_2] Handle strategy reported', []);
+  let ethTransaction = getOrCreateTransactionFromEvent(
+    event,
+    'StrategyReportedEvent'
+  );
+
+  strategyLibrary.createReport(
+    ethTransaction,
+    event.params.strategy.toHexString(),
+    event.params.gain,
+    event.params.loss,
+    event.params.totalGain,
+    event.params.totalLoss,
+    event.params.totalDebt,
+    event.params.debtAdded,
+    event.params.debtRatio,
+    event.params.debtPaid,
     event
   );
 
