@@ -7,7 +7,8 @@ import {
   Transfer,
   Vault,
 } from '../../generated/schema';
-import { usdcPrice } from './oracle/usdc-oracle';
+import { usdcPrice } from './oracle/usdcOracle';
+import * as yearn from './yearn';
 
 export function buildIdFromAccountToAccountAndTransaction(
   fromAccount: Account,
@@ -48,6 +49,12 @@ export function getOrCreate(
     }
   }
 
+  let tokenAmountUsdc = usdcPrice(Address.fromString(token.id), amount);
+
+  if (isProtocolFee) {
+    yearn.addProtocolFee(tokenAmountUsdc);
+  }
+
   let transfer = Transfer.load(id);
   if (transfer === null) {
     transfer = new Transfer(id);
@@ -57,7 +64,7 @@ export function getOrCreate(
     transfer.to = toAccount.id;
     transfer.vault = vault.id;
     transfer.tokenAmount = amount;
-    transfer.tokenAmountUsdc = usdcPrice(Address.fromString(token.id), amount);
+    transfer.tokenAmountUsdc = tokenAmountUsdc;
     transfer.token = token.id;
     transfer.shareToken = shareToken.id;
     transfer.shareAmount = shareAmount;
@@ -65,5 +72,6 @@ export function getOrCreate(
     transfer.isProtocolFee = isProtocolFee;
     transfer.save();
   }
+
   return transfer!;
 }
