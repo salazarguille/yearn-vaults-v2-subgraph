@@ -1,6 +1,7 @@
 import { log } from '@graphprotocol/graph-ts';
 import {
   StrategyReported as StrategyReported_v0_3_0_v0_3_1_Event,
+  StrategyMigrated,
   StrategyReported1 as StrategyReportedEvent,
   Deposit1Call as DepositCall,
   Transfer as TransferEvent,
@@ -19,6 +20,7 @@ import {
   StrategyRemovedFromQueue as StrategyRemovedFromQueueEvent,
   UpdateRewards as UpdateRewardsEvent,
 } from '../../generated/Registry/Vault';
+import { Strategy } from '../../generated/schema';
 import { printCallInfo } from '../utils/commons';
 import { BIGINT_ZERO, ZERO_ADDRESS } from '../utils/constants';
 import * as strategyLibrary from '../utils/strategy/strategy';
@@ -45,7 +47,7 @@ export function handleAddStrategyV2(call: AddStrategyV2Call): void {
     'AddStrategyV2Call'
   );
 
-  strategyLibrary.create(
+  strategyLibrary.createAndGet(
     ethTransaction.id,
     call.inputs.strategy,
     call.to,
@@ -72,7 +74,7 @@ export function handleAddStrategy(call: AddStrategyV1Call): void {
   }
   let ethTransaction = getOrCreateTransactionFromCall(call, 'AddStrategyCall');
 
-  strategyLibrary.create(
+  strategyLibrary.createAndGet(
     ethTransaction.id,
     call.inputs._strategy,
     call.to,
@@ -168,6 +170,45 @@ export function handleStrategyReported(event: StrategyReportedEvent): void {
     vaultContractAddress,
     vaultContract.pricePerShare()
   );
+}
+
+export function handleStrategyMigrated(event: StrategyMigrated): void {
+  log.info(
+    '[Strategy Migrated] Handle strategy migrated event. Old strategy: {} New strategy: {}',
+    [
+      event.params.oldVersion.toHexString(),
+      event.params.newVersion.toHexString(),
+    ]
+  );
+  let ethTransaction = getOrCreateTransactionFromEvent(
+    event,
+    'StrategyMigratedEvent'
+  );
+
+  let oldStrategy = Strategy.load(event.params.oldVersion.toHexString());
+
+  if (oldStrategy !== null) {
+    let newStrategyAddress = event.params.newVersion;
+
+    if (Strategy.load(newStrategyAddress.toHexString()) !== null) {
+      log.warning(
+        '[Strategy Migrated] Migrating to strategy {} but it has already been created',
+        [newStrategyAddress.toHexString()]
+      );
+    } else {
+      strategyLibrary.createAndGet(
+        ethTransaction.id,
+        newStrategyAddress,
+        event.address,
+        oldStrategy.debtLimit,
+        oldStrategy.rateLimit,
+        oldStrategy.minDebtPerHarvest,
+        oldStrategy.maxDebtPerHarvest,
+        oldStrategy.performanceFeeBps,
+        ethTransaction
+      );
+    }
+  }
 }
 
 //  VAULT BALANCE UPDATES
