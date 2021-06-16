@@ -1,6 +1,5 @@
 import { Address } from '@graphprotocol/graph-ts';
 import { Token } from '../../generated/schema';
-
 import { ERC20 } from '../../generated/Registry/ERC20';
 import { DEFAULT_DECIMALS } from '../utils/constants';
 

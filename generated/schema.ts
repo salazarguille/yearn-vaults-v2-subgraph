@@ -209,6 +209,73 @@ export class Token extends Entity {
   }
 }
 
+export class TokenFee extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save TokenFee entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save TokenFee entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("TokenFee", id.toString(), this);
+  }
+
+  static load(id: string): TokenFee | null {
+    return store.get("TokenFee", id) as TokenFee | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get treasuryFees(): BigInt {
+    let value = this.get("treasuryFees");
+    return value.toBigInt();
+  }
+
+  set treasuryFees(value: BigInt) {
+    this.set("treasuryFees", Value.fromBigInt(value));
+  }
+
+  get strategyFees(): BigInt {
+    let value = this.get("strategyFees");
+    return value.toBigInt();
+  }
+
+  set strategyFees(value: BigInt) {
+    this.set("strategyFees", Value.fromBigInt(value));
+  }
+
+  get totalFees(): BigInt {
+    let value = this.get("totalFees");
+    return value.toBigInt();
+  }
+
+  set totalFees(value: BigInt) {
+    this.set("totalFees", Value.fromBigInt(value));
+  }
+
+  get token(): string {
+    let value = this.get("token");
+    return value.toString();
+  }
+
+  set token(value: string) {
+    this.set("token", Value.fromString(value));
+  }
+}
+
 export class Registry extends Entity {
   constructor(id: string) {
     super();

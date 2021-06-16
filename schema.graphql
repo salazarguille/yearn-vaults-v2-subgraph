@@ -46,6 +46,18 @@ type Token @entity {
   symbol: String!
 }
 
+type TokenFee @entity {
+  "Token address"
+  id: ID!
+  "Fees paid using this token to the treasury"
+  treasuryFees: BigInt!
+  "Fees paid using this token to strategies"
+  strategyFees: BigInt!
+  "Fees paid using this token to strategies and the treasury"
+  totalFees: BigInt!
+  token: Token!
+}
+
 enum VaultClassification {
   Endorsed
   Experimental
