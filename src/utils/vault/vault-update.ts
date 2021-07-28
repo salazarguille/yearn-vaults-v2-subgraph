@@ -58,7 +58,7 @@ function createVaultUpdate(
   vaultUpdate.rewards = rewards;
 
   if (vault.balanceTokens.gt(balancePosition)) {
-    vaultUpdate.returnsGenerated = balancePosition;
+    vaultUpdate.returnsGenerated = BIGINT_ZERO;
   } else {
     vaultUpdate.returnsGenerated = balancePosition.minus(vault.balanceTokens);
   }
