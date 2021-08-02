@@ -38,7 +38,7 @@ export function getOrCreate(
     transaction
   );
 
-  let tokenAmountUsdc = usdcPrice(Address.fromString(token.id), amount);
+  let tokenAmountUsdc = usdcPrice(token, amount);
 
   let toAddress = Address.fromString(toAccount.id);
   let isFeeToTreasury = toAddress.equals(vault.rewards);

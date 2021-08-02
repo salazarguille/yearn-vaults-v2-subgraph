@@ -3,6 +3,10 @@ import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts';
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 export const GOVERNANCE_ADDRESS = '0xba37b002abafdd8e89a1995da52740bbc013d992';
 export const USDC_ORACLE_ADDRESS = '0x83d95e0d5f402511db06817aff3f9ea88224b030';
+export const CALCULATIONS_CURVE_ADDRESS =
+  '0x25BF7b72815476Dd515044F9650Bf79bAd0Df655';
+export const CALCULATIONS_SUSHI_SWAP_ADDRESS =
+  '0x8263e161A855B644f582d9C164C66aABEe53f927';
 export const DEFAULT_DECIMALS = 18;
 export let BIGINT_ZERO = BigInt.fromI32(0);
 export let BIGINT_ONE = BigInt.fromI32(1);

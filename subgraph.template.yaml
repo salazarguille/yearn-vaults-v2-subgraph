@@ -143,6 +143,10 @@ dataSources:
           file: ./abis/StrategyAPI.json
         - name: Oracle
           file: ./abis/Oracle.json
+        - name: CalculationsCurve
+          file: ./abis/CalculationsCurve.json
+        - name: CalculationsSushiSwap
+          file: ./abis/CalculationsSushiSwap.json
       eventHandlers:
         - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleStrategyReported_v0_3_0_v0_3_1
@@ -224,6 +228,10 @@ dataSources:
           file: ./abis/StrategyAPI.json
         - name: Oracle
           file: ./abis/Oracle.json
+        - name: CalculationsCurve
+          file: ./abis/CalculationsCurve.json
+        - name: CalculationsSushiSwap
+          file: ./abis/CalculationsSushiSwap.json
       eventHandlers:
         - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleStrategyReported_v0_3_0_v0_3_1
@@ -298,6 +306,10 @@ templates:
           file: ./abis/StrategyAPI.json
         - name: Oracle
           file: ./abis/Oracle.json
+        - name: CalculationsCurve
+          file: ./abis/CalculationsCurve.json
+        - name: CalculationsSushiSwap
+          file: ./abis/CalculationsSushiSwap.json
       eventHandlers:
         - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleStrategyReported_v0_3_0_v0_3_1
