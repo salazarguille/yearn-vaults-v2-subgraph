@@ -148,7 +148,7 @@ export function deposit(
     accountVaultPosition.shareToken = vault.shareToken;
     accountVaultPosition.transaction = transaction.id;
     accountVaultPosition.balanceTokens = depositedTokens;
-    accountVaultPosition.balanceShares = receivedShares;
+    accountVaultPosition.balanceShares = balanceShares;
     accountVaultPosition.balanceProfit = BIGINT_ZERO;
     accountVaultPositionUpdate = vaultPositionUpdateLibrary.createFirst(
       account,
@@ -169,9 +169,7 @@ export function deposit(
     accountVaultPosition.balanceTokens = accountVaultPosition.balanceTokens.plus(
       depositedTokens
     );
-    accountVaultPosition.balanceShares = accountVaultPosition.balanceShares.plus(
-      receivedShares
-    );
+    accountVaultPosition.balanceShares = balanceShares;
     accountVaultPositionUpdate = vaultPositionUpdateLibrary.deposit(
       account,
       vault,
@@ -234,9 +232,7 @@ export function withdraw(
     balanceShares,
     balancePosition
   );
-  accountVaultPosition.balanceShares = accountVaultPosition.balanceShares.minus(
-    sharesBurnt
-  );
+  accountVaultPosition.balanceShares = balanceShares;
   accountVaultPosition.balanceTokens = getBalanceTokens(
     accountVaultPosition.balanceTokens,
     withdrawnAmount
@@ -386,9 +382,7 @@ export function transferForAccount(
       accountVaultPosition.balanceTokens,
       tokenAmount
     );
-    accountVaultPosition.balanceShares = receivingTransfer
-      ? accountVaultPosition.balanceShares.plus(shareAmount)
-      : accountVaultPosition.balanceShares.minus(shareAmount);
+    accountVaultPosition.balanceShares = balanceShares;
     accountVaultPosition.balancePosition = balancePosition;
     accountVaultPosition.balanceProfit = getBalanceProfit(
       accountVaultPosition.balanceShares,
