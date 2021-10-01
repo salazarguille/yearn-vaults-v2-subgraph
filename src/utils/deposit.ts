@@ -60,5 +60,5 @@ export function getOrCreate(
     deposit.save();
   }
 
-  return deposit!;
+  return deposit;
 }

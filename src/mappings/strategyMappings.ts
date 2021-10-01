@@ -81,7 +81,7 @@ export function handleCloned(event: ClonedEvent): void {
     txHash,
   ]);
   log.info('StrategyCloned txHash {} event.transaction.to {}', [
-    event.transaction.to.toHexString(),
+    event.transaction.to!.toHexString(),
     txHash,
   ]);
   log.info('StrategyCloned txHash {} event.transaction.input {}', [

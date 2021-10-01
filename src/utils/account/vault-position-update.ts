@@ -115,7 +115,7 @@ export function createFirst(
     );
   }
 
-  return accountVaultPositionFirstUpdate!;
+  return accountVaultPositionFirstUpdate;
 }
 
 export function getNewOrder(id: string, txHash: string): BigInt {
@@ -196,7 +196,7 @@ export function deposit(
     );
   }
 
-  return accountVaultPositionUpdate!;
+  return accountVaultPositionUpdate;
 }
 
 export function transfer(

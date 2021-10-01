@@ -55,7 +55,7 @@ export function getOrCreate(
       [account.id, vault.id, txHash]
     );
   }
-  return accountVaultPosition!;
+  return accountVaultPosition;
 }
 
 export function getBalancePosition(
@@ -187,8 +187,8 @@ export function deposit(
   accountVaultPosition.save();
 
   return VaultPositionResponse.fromValue(
-    accountVaultPosition!,
-    accountVaultPositionUpdate!
+    accountVaultPosition,
+    accountVaultPositionUpdate
   );
 }
 

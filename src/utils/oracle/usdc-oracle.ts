@@ -1,29 +1,72 @@
-import { Address, BigInt, log } from '@graphprotocol/graph-ts';
+import { Address, BigInt, log, dataSource } from '@graphprotocol/graph-ts';
 import { Oracle as OracleContract } from '../../../generated/registry/Oracle';
 import { Token } from '../../../generated/schema';
 import { CalculationsCurve as CalculationsCurveContract } from '../../../generated/templates/Vault/CalculationsCurve';
 import { CalculationsSushiSwap as CalculationsSushiSwapContract } from '../../../generated/templates/Vault/CalculationsSushiSwap';
 import {
   BIGINT_ZERO,
-  CALCULATIONS_CURVE_ADDRESS,
-  CALCULATIONS_SUSHI_SWAP_ADDRESS,
-  USDC_ORACLE_ADDRESS,
+  ETH_MAINNET_CALCULATIONS_CURVE_ADDRESS,
+  ETH_MAINNET_CALCULATIONS_SUSHI_SWAP_ADDRESS,
+  ETH_MAINNET_NETWORK,
+  FTM_MAINNET_NETWORK,
+  ETH_MAINNET_USDC_ORACLE_ADDRESS,
+  FTM_MAINNET_CALCULATIONS_SUSHI_SWAP_ADDRESS,
+  FTM_MAINNET_USDC_ORACLE_ADDRESS,
+  FTM_MAINNET_CALCULATIONS_SPOOKY_SWAP_ADDRESS,
 } from '../constants';
 
+function getSushiSwapCalculationsAddress(network: string): Address {
+  let map = new Map<string, string>();
+  map.set(ETH_MAINNET_NETWORK, ETH_MAINNET_CALCULATIONS_SUSHI_SWAP_ADDRESS);
+  map.set(FTM_MAINNET_NETWORK, FTM_MAINNET_CALCULATIONS_SUSHI_SWAP_ADDRESS);
+  let address = changetype<Address>(Address.fromHexString(map.get(network)));
+  log.info('Getting SushiSwap Calculations address {} in {}.', [
+    address.toHexString(),
+    network,
+  ]);
+  return address;
+}
+
+function getOracleCalculatorAddress(network: string): Address {
+  let map = new Map<string, string>();
+  map.set(ETH_MAINNET_NETWORK, ETH_MAINNET_USDC_ORACLE_ADDRESS);
+  map.set(FTM_MAINNET_NETWORK, FTM_MAINNET_USDC_ORACLE_ADDRESS);
+  let address = changetype<Address>(Address.fromHexString(map.get(network)));
+  log.info('Getting Oracle Calculations address {} in {}.', [
+    address.toHexString(),
+    network,
+  ]);
+  return address;
+}
+
+function getCurveCalculationsAddress(network: string): Address {
+  let map = new Map<string, string>();
+  map.set(ETH_MAINNET_NETWORK, ETH_MAINNET_CALCULATIONS_CURVE_ADDRESS);
+  // Note: Curve is not present in Fantom, so we use Spooky Swap.
+  map.set(FTM_MAINNET_NETWORK, FTM_MAINNET_CALCULATIONS_SPOOKY_SWAP_ADDRESS);
+  let address = changetype<Address>(Address.fromHexString(map.get(network)));
+  log.info('Getting Curve Calculations address {} in {}.', [
+    address.toHexString(),
+    network,
+  ]);
+  return address;
+}
+
 function getSushiSwapCalculations(): CalculationsSushiSwapContract {
+  let network = dataSource.network();
   return CalculationsSushiSwapContract.bind(
-    Address.fromString(CALCULATIONS_SUSHI_SWAP_ADDRESS)
+    getSushiSwapCalculationsAddress(network)
   );
 }
 
 function getCurveCalculations(): CalculationsCurveContract {
-  return CalculationsCurveContract.bind(
-    Address.fromString(CALCULATIONS_CURVE_ADDRESS)
-  );
+  let network = dataSource.network();
+  return CalculationsCurveContract.bind(getCurveCalculationsAddress(network));
 }
 
 function getOracleCalculator(): OracleContract {
-  return OracleContract.bind(Address.fromString(USDC_ORACLE_ADDRESS));
+  let network = dataSource.network();
+  return OracleContract.bind(getOracleCalculatorAddress(network));
 }
 
 export function usdcPrice(token: Token, tokenAmount: BigInt): BigInt {
@@ -60,7 +103,7 @@ export function usdcPrice(token: Token, tokenAmount: BigInt): BigInt {
 }
 
 export function usdcPricePerToken(tokenAddress: Address): BigInt {
-  let oracle = OracleContract.bind(Address.fromString(USDC_ORACLE_ADDRESS));
+  let oracle = getOracleCalculator();
   if (oracle !== null) {
     let result = oracle.try_getPriceUsdcRecommended(tokenAddress);
     if (result.reverted === false) {

@@ -89,5 +89,15 @@ export function handleNewExperimentalVault(
 }
 
 export function handleVaultTagged(event: VaultTaggedEvent): void {
+  log.info(
+    '[Registry] VaultTagged: Registry {} - Vault {} - Tag {} - Sender {} - TX {}',
+    [
+      dataSource.address().toHexString(),
+      event.params.vault.toHexString(),
+      event.params.tag,
+      event.transaction.from.toHexString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
   vaultLibrary.tag(event.params.vault, event.params.tag);
 }

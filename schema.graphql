@@ -17,8 +17,8 @@ type Transaction @entity {
   from: Bytes!
   "Gas price used in the transaction"
   gasPrice: BigInt!
-  "Gas sent used in the transaction"
-  gasSent: BigInt!
+  "Gas limit used in the transaction"
+  gasLimit: BigInt!
   "Transaction hash"
   hash: Bytes!
   "The transaction index"
@@ -29,8 +29,8 @@ type Transaction @entity {
   value: BigInt!
   "Timestamp when the transaction was executed"
   timestamp: BigInt!
-  "Gas limit used in the transaction"
-  gasLimit: BigInt!
+  "Gas limit used in the current block"
+  blockGasLimit: BigInt!
   "Block number"
   blockNumber: BigInt!
 }

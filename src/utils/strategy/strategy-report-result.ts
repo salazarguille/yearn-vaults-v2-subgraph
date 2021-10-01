@@ -69,5 +69,5 @@ export function create(
     strategyReportResult.apr = apr;
   }
   strategyReportResult.save();
-  return strategyReportResult!;
+  return strategyReportResult;
 }

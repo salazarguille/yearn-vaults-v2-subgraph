@@ -27,7 +27,7 @@ import {
   ZERO_ADDRESS,
   YV_WBTC_VAULT_END_BLOCK_CUSTOM,
   DON_T_CREATE_VAULT_TEMPLATE,
-  REGISTRY_ADDRESS_V2,
+  ETH_MAINNET_REGISTRY_ADDRESS_V2,
   ENDORSED,
   API_VERSION_0_3_5,
 } from '../utils/constants';
@@ -44,7 +44,8 @@ function createYvWBTCVaultIfNeeded(
 ): Vault {
   return vaultLibrary.createCustomVaultIfNeeded(
     vaultAddress,
-    REGISTRY_ADDRESS_V2,
+    // Note: This custom mapping is not used in Fantom. So, we can hardcoded the address.
+    changetype<Address>(Address.fromHexString(ETH_MAINNET_REGISTRY_ADDRESS_V2)),
     ENDORSED,
     API_VERSION_0_3_5,
     transaction,

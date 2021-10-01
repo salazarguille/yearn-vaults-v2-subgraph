@@ -72,5 +72,5 @@ export function getOrCreate(
     transfer.save();
   }
 
-  return transfer!;
+  return transfer;
 }

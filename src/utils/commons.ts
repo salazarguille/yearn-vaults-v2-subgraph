@@ -69,7 +69,6 @@ export function printCallInfo(label: string, call: ethereum.Call): void {
   log.info('{} {} block {} call.from {}', [
     label,
     txHash,
-    ,
     blockNumber,
     call.from.toHexString(),
   ]);
@@ -83,7 +82,7 @@ export function printCallInfo(label: string, call: ethereum.Call): void {
     label,
     txHash,
     blockNumber,
-    call.transaction.to.toHexString(),
+    call.transaction.to!.toHexString(),
   ]);
   log.info('{} {} block {} dataSource.address {}', [
     label,

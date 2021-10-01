@@ -96,7 +96,7 @@ export function firstDeposit(
     );
   }
 
-  return vaultUpdate!;
+  return vaultUpdate;
 }
 
 export function deposit(
@@ -110,7 +110,10 @@ export function deposit(
   log.debug('[VaultUpdate] Deposit', []);
   let vaultUpdateId = buildIdFromVaultAndTransaction(vault, transaction);
   let vaultUpdate = VaultUpdate.load(vaultUpdateId);
-  let latestVaultUpdate = VaultUpdate.load(vault.latestUpdate);
+  let latestVaultUpdate: VaultUpdate | null;
+  if (vault.latestUpdate !== null) {
+    latestVaultUpdate = VaultUpdate.load(vault.latestUpdate!);
+  }
 
   if (vaultUpdate === null) {
     vaultUpdate = createVaultUpdate(
@@ -122,14 +125,14 @@ export function deposit(
       sharesMinted,
       BIGINT_ZERO, // SharesBurnt,
       pricePerShare,
-      latestVaultUpdate.totalFees,
-      latestVaultUpdate.managementFees,
-      latestVaultUpdate.performanceFees,
+      latestVaultUpdate!.totalFees,
+      latestVaultUpdate!.managementFees,
+      latestVaultUpdate!.performanceFees,
       balancePosition
     );
   }
 
-  return vaultUpdate!;
+  return vaultUpdate;
 }
 
 export function withdraw(

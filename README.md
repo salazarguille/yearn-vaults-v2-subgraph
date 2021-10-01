@@ -33,6 +33,9 @@ At this moment, the scripts available are:
 
 ## Subgraphs
 
-The official subgraph link is [this](https://thegraph.com/explorer/subgraph?id=0xf50b705e4eaba269dfe954f10c65bd34e6351e0c-0&version=0xf50b705e4eaba269dfe954f10c65bd34e6351e0c-0-0&view=Overview).
+The official subgraph links are:
+
+- [Ethereum mainnet](https://thegraph.com/explorer/subgraph?id=0xf50b705e4eaba269dfe954f10c65bd34e6351e0c-0&version=0xf50b705e4eaba269dfe954f10c65bd34e6351e0c-0-0&view=Overview).
+- [Fantom Network](https://thegraph.com/legacy-explorer/subgraph/yearn/yearn-vaults-v2-fantom)
 
 ---
